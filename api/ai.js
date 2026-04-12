@@ -6,32 +6,26 @@ export default async function handler(req, res) {
   try {
     const { prompt } = req.body;
 
-    const API_KEY = process.env.HYPEREAL_API_KEY;
-
-    const response = await fetch("https://api.hypereal.ai/v1/chat/completions", {
+    const response = await fetch("https://api.hypereal.ai/v1/chat", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${process.env.HYPEREAL_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "hypereal-chat",
-        messages: [
-          { role: "user", content: prompt }
-        ]
+        message: prompt
       })
     });
 
     const data = await response.json();
 
-    const reply =
-      data?.choices?.[0]?.message?.content ||
-      data?.error?.message ||
-      "No response";
-
-    res.status(200).json({ result: reply });
+    res.status(200).json({
+      result: data.reply || data.response || "No response"
+    });
 
   } catch (error) {
-    res.status(500).json({ result: error.message });
+    res.status(500).json({
+      result: "Error: " + error.message
+    });
   }
 }
