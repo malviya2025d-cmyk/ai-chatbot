@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer YOUR_OPENROUTER_API_KEY"
+        "Authorization": "Bearer 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"
       },
       body: JSON.stringify({
         model: "openai/gpt-4o-mini",
