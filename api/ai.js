@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const { prompt } = req.body;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDzSRe6KzwQkVunyePfhICsvPHem_kxuwM",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDzSRe6KzwQkVunyePfhICsvPHem_kxuwM",
       {
         method: "POST",
         headers: {
@@ -16,9 +16,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           contents: [
             {
-              parts: [
-                { text: prompt }
-              ]
+              parts: [{ text: prompt }]
             }
           ]
         })
