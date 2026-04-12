@@ -16,16 +16,25 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
+    const text = await response.text(); // 👈 IMPORTANT
 
-    // 👇 pura response bhej rahe hain
-    res.status(200).json({
-      result: JSON.stringify(data, null, 2)
-    });
+    try {
+      const data = JSON.parse(text);
+
+      res.status(200).json({
+        result: data.choices?.[0]?.message?.content || "No response"
+      });
+
+    } catch {
+      // 👇 agar HTML aaya to yaha dikhega
+      res.status(200).json({
+        result: "API Error: " + text
+      });
+    }
 
   } catch (error) {
     res.status(500).json({
-      result: "Error: " + error.message
+      result: "Fetch Error: " + error.message
     });
   }
 }
