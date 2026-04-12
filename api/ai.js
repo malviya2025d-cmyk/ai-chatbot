@@ -10,21 +10,26 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
+        "Authorization": "Bearer YOUR_OPENROUTER_API_KEY"
       },
       body: JSON.stringify({
-        model: "openai/gpt-4o-mini",
+        model: "meta-llama/llama-3.1-8b-instruct",
         messages: [{ role: "user", content: prompt }]
       })
     });
 
     const data = await response.json();
 
-    res.status(200).json({
-      result: data?.choices?.[0]?.message?.content || "No response"
-    });
+    console.log("OPENROUTER RESPONSE:", data);
+
+    const reply =
+      data?.choices?.[0]?.message?.content ||
+      data?.error?.message ||
+      "No response from AI";
+
+    res.status(200).json({ result: reply });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ result: error.message });
   }
 }
