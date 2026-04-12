@@ -1,19 +1,29 @@
 async function send() {
-  const input = document.getElementById("input");
+  const inputField = document.getElementById("input");
   const chatbox = document.getElementById("chatbox");
 
-  const text = input.value;
-  input.value = "";
+  const message = inputField.value;
 
-  chatbox.innerHTML += `<p><b>You:</b> ${text}</p>`;
+  if (!message) return;
 
-  const res = await fetch("/api/ai", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: text })
-  });
+  chatbox.innerHTML += `<p style="color:green;"><b>You:</b> ${message}</p>`;
+  inputField.value = "";
 
-  const data = await res.json();
+  try {
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt: message })
+    });
 
-  chatbox.innerHTML += `<p><b>AI:</b> ${data.result}</p>`;
+    const data = await res.json();
+
+    chatbox.innerHTML += `<p style="color:blue;"><b>AI:</b> ${data.result}</p>`;
+  } catch (error) {
+    chatbox.innerHTML += `<p style="color:red;">Error: ${error.message}</p>`;
+  }
+
+  chatbox.scrollTop = chatbox.scrollHeight;
 }
