@@ -6,31 +6,26 @@ export default async function handler(req, res) {
   try {
     const { prompt } = req.body;
 
-    const API_KEY = process.env.GEMINI_API_KEY;
+    const API_KEY = process.env.HYPEREAL_API_KEY;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }]
-            }
-          ]
-        })
-      }
-    );
+    const response = await fetch("https://api.hypereal.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "hypereal-chat",
+        messages: [
+          { role: "user", content: prompt }
+        ]
+      })
+    });
 
     const data = await response.json();
 
-    console.log(data);
-
     const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data?.choices?.[0]?.message?.content ||
       data?.error?.message ||
       "No response";
 
