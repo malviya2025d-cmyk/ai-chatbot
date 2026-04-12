@@ -1,8 +1,4 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
-  }
-
   try {
     const { prompt } = req.body;
 
@@ -13,7 +9,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192", // 🔥 best free model
+        model: "llama3-8b-8192",
         messages: [
           { role: "user", content: prompt }
         ]
@@ -22,8 +18,9 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // 👇 pura response bhej rahe hain
     res.status(200).json({
-      result: data.choices?.[0]?.message?.content || "No response"
+      result: JSON.stringify(data, null, 2)
     });
 
   } catch (error) {
