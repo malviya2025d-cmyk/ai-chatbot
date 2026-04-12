@@ -1,4 +1,8 @@
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST allowed" });
+  }
+
   try {
     const { prompt } = req.body;
 
@@ -16,25 +20,15 @@ export default async function handler(req, res) {
       })
     });
 
-    const text = await response.text(); // 👈 IMPORTANT
+    const data = await response.json();
 
-    try {
-      const data = JSON.parse(text);
-
-      res.status(200).json({
-        result: data.choices?.[0]?.message?.content || "No response"
-      });
-
-    } catch {
-      // 👇 agar HTML aaya to yaha dikhega
-      res.status(200).json({
-        result: "API Error: " + text
-      });
-    }
+    res.status(200).json({
+      result: data.choices?.[0]?.message?.content || "No response"
+    });
 
   } catch (error) {
     res.status(500).json({
-      result: "Fetch Error: " + error.message
+      result: "Error: " + error.message
     });
   }
 }
