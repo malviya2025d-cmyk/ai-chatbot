@@ -1,20 +1,24 @@
 async function sendMessage() {
   const input = document.getElementById("input").value;
+  const chat = document.getElementById("chat");
 
-  try {
-    const res = await fetch("/api/ai", {   // ✅ IMPORTANT CHANGE
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ prompt: input })
-    });
+  chat.innerHTML += `<p><b>You:</b> ${input}</p>`;
 
-    const data = await res.json();
+  const res = await fetch("/api/ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ prompt: input })
+  });
 
-    document.getElementById("output").innerText = data.result;
+  const data = await res.json();
 
-  } catch (err) {
-    document.getElementById("output").innerText = "Error: " + err.message;
+  if (data.error) {
+    chat.innerHTML += `<p><b>Bot:</b> Error: ${data.error}</p>`;
+  } else {
+    chat.innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
   }
+
+  document.getElementById("input").value = "";
 }
