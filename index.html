@@ -1,18 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Chatbot</title>
+  <title>AI Super Hub</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>AI Chatbot 🤖</h1>
+<div class="container">
 
-  <div id="chatbox"></div>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <h2>AI Hub 🤖</h2>
 
-  <input id="input" placeholder="Type message..." />
-  <button onclick="send()">Send</button>
+    <ul>
+      <li onclick="showPage('home')">🏠 Home</li>
+      <li onclick="showPage('chat')">💬 AI Chat</li>
+      <li onclick="showPage('pdf')">📄 PDF Tools</li>
+      <li onclick="showPage('image')">🎨 Image</li>
+      <li onclick="showPage('video')">🎬 Video</li>
+    </ul>
+  </div>
 
-  <script src="script.js"></script>
+  <!-- Main -->
+  <div class="main">
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <!-- HOME -->
+    <div id="home" class="page active">
+      <h1>Dashboard</h1>
+      <div class="cards">
+        <div class="card" onclick="showPage('chat')">💬 AI Chat</div>
+        <div class="card">📄 PDF Tools</div>
+        <div class="card">🎨 Image Generator</div>
+        <div class="card">🎬 Video Maker</div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat" class="page">
+      <h1>AI Chat 🤖</h1>
+
+      <div id="chatbox"></div>
+
+      <input id="input" placeholder="Type message..." />
+      <button onclick="send()">Send</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
