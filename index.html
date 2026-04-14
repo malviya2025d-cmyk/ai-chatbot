@@ -1,206 +1,105 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<title>AI Tools Hub Pro - Free AI Chat, Blog, Translate, PDF & Image Tools</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="Free AI Tools Hub - Chat AI, Blog Generator, Image Editor, PDF Tools and Translate AI. Best free online SaaS platform.">
+<meta name="keywords" content="free ai tools, ai chat, blog generator ai, image editor online, pdf tools, translate ai, seo tools">
+<meta name="robots" content="index, follow">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E48LS72B74"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E48LS72B74');
+</script>
+
+<!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
 crossorigin="anonymous"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Tools Hub Pro</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial;}
-
-body{
-margin:0;
-background:#0f0f0f;
-color:white;
-}
-
-/* SIDEBAR */
-.top{
-display:flex;
-flex-wrap:wrap;
-gap:8px;
-padding:10px;
-background:#111;
-position:sticky;
-top:0;
-}
-
-.top button{
-flex:1;
-min-width:110px;
-padding:10px;
-border:none;
-background:#00c853;
-font-weight:bold;
-cursor:pointer;
-border-radius:6px;
-transition:0.2s;
-}
-
-.top button:hover{
-transform:scale(1.05);
-}
-
-/* MAIN */
+body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;}
+header{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#111;position:sticky;top:0;z-index:999;}
+header button{flex:1;min-width:120px;padding:10px;border:none;background:#00c853;font-weight:bold;border-radius:6px;cursor:pointer;}
 .container{padding:10px;}
-
-.tool{
-display:none;
-background:#1e1e1e;
-padding:15px;
-border-radius:10px;
-animation:fade 0.3s ease-in;
-}
-
-@keyframes fade{
-from{opacity:0;transform:translateY(10px);}
-to{opacity:1;transform:translateY(0);}
-}
-
+.tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px;}
 .active{display:block;}
-
-input,textarea,select{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-outline:none;
-border-radius:6px;
-}
-
-button{
-width:100%;
-padding:12px;
-margin-top:10px;
-background:#00c853;
-border:none;
-cursor:pointer;
-font-weight:bold;
-border-radius:6px;
-}
-
-/* CHAT */
-#chatbox{
-height:300px;
-overflow-y:auto;
-background:#0f0f0f;
-padding:10px;
-border-radius:10px;
-display:flex;
-flex-direction:column;
-gap:8px;
-}
-
-.msg{
-max-width:75%;
-padding:10px;
-border-radius:10px;
-font-size:14px;
-}
-
-.user{
-background:#00c853;
-color:black;
-align-self:flex-end;
-}
-
-.bot{
-background:#333;
-color:white;
-align-self:flex-start;
-}
-
-/* CANVAS */
-canvas{
-width:100%;
-background:#111;
-border-radius:10px;
-margin-top:10px;
-}
+input,textarea,select{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none;outline:none;}
+button{width:100%;padding:10px;margin-top:10px;background:#00c853;border:none;border-radius:6px;font-weight:bold;cursor:pointer;}
+#chatbox{height:300px;overflow:auto;background:#000;padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:8px;}
+.msg{padding:10px;border-radius:10px;max-width:75%;}
+.user{background:#00c853;color:#000;align-self:flex-end;}
+.bot{background:#333;}
+.ad{background:#222;padding:10px;margin:10px 0;text-align:center;color:#aaa;}
 </style>
+
 </head>
 
 <body>
 
-<!-- MENU -->
-<div class="top">
+<header>
 <button onclick="show('chat')">🤖 Chat</button>
-<button onclick="show('canva')">🎨 Editor</button>
-<button onclick="show('pdf')">📄 PDF</button>
 <button onclick="show('blog')">✍️ Blog</button>
 <button onclick="show('trans')">🌍 Translate</button>
-</div>
+<button onclick="show('pdf')">📄 PDF</button>
+<button onclick="show('img')">🎨 Image</button>
+</header>
 
 <div class="container">
 
+<div class="ad">🔝 Ad Space</div>
+
 <!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>🤖 AI Chat</h2>
-
-<select id="lang">
-<option value="auto">Auto</option>
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="es">Spanish</option>
-<option value="fr">French</option>
-</select>
-
+<h2>AI Chat</h2>
 <div id="chatbox"></div>
-
 <input id="input" placeholder="Type message..." />
 <button onclick="sendChat()">Send</button>
 </div>
 
-<!-- CANVA -->
-<div id="canva" class="tool">
-<h2>🎨 Image Editor</h2>
-
-<input type="file" onchange="loadImage(event)" />
-<canvas id="canvas"></canvas>
-
-<button onclick="gray()">Grayscale</button>
-<button onclick="blurImg()">Blur</button>
-<button onclick="bg()">Background</button>
-<button onclick="downloadImg()">Download</button>
-</div>
-
-<!-- PDF -->
-<div id="pdf" class="tool">
-<h2>📄 PDF Tool</h2>
-
-<textarea id="pdfText" rows="6"></textarea>
-<button onclick="downloadPDF()">Download PDF</button>
-</div>
+<div class="ad">💰 Ad Space</div>
 
 <!-- BLOG -->
 <div id="blog" class="tool">
-<h2>✍️ Blog AI</h2>
-
+<h2>Blog Generator</h2>
 <input id="blogInput" placeholder="Topic..." />
 <button onclick="generateBlog()">Generate</button>
-
 <div id="blogOut"></div>
 </div>
 
 <!-- TRANSLATE -->
 <div id="trans" class="tool">
-<h2>🌍 Translate Tool (AI)</h2>
-
-<input id="fromText" placeholder="Enter text..." />
-
-<select id="toLang">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="es">Spanish</option>
-<option value="fr">French</option>
-<option value="de">German</option>
+<h2>Translate AI</h2>
+<input id="text" placeholder="Text..." />
+<select id="lang">
+<option>en</option><option>hi</option><option>es</option><option>fr</option>
 </select>
-
 <button onclick="translateText()">Translate</button>
-
-<div id="outText"></div>
+<div id="out"></div>
 </div>
+
+<!-- PDF -->
+<div id="pdf" class="tool">
+<h2>PDF Tool</h2>
+<textarea id="pdfText"></textarea>
+<button onclick="makePDF()">Download PDF</button>
+</div>
+
+<!-- IMAGE -->
+<div id="img" class="tool">
+<h2>Image Tool</h2>
+<input type="file" onchange="loadImg(event)">
+<canvas id="c"></canvas>
+<button onclick="gray()">Grayscale</button>
+</div>
+
+<div class="ad">📊 Footer Ad</div>
 
 </div>
 
@@ -213,127 +112,81 @@ document.getElementById(id).classList.add('active');
 }
 
 /* CHAT */
-const input=document.getElementById("input");
-const chatbox=document.getElementById("chatbox");
-
 async function sendChat(){
-
-let text=input.value.trim();
-let lang=document.getElementById("lang").value;
-
-if(!text) return;
+let text=document.getElementById("input").value;
+if(!text)return;
 
 chatbox.innerHTML+=`<div class="msg user">${text}</div>`;
-input.value="";
-
-const res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:text,lang})
-});
-
-const data=await res.json();
-
-chatbox.innerHTML+=`<div class="msg bot">${data.reply}</div>`;
-}
-
-/* IMAGE */
-let canvas=document.getElementById("canvas");
-let ctx=canvas.getContext("2d");
-let img=new Image();
-
-function loadImage(e){
-let reader=new FileReader();
-
-reader.onload=function(){
-img=new Image();
-img.onload=function(){
-canvas.width=300;
-canvas.height=300;
-ctx.drawImage(img,0,0,300,300);
-};
-img.src=reader.result;
-};
-
-reader.readAsDataURL(e.target.files[0]);
-}
-
-function gray(){
-let d=ctx.getImageData(0,0,canvas.width,canvas.height);
-let data=d.data;
-
-for(let i=0;i<data.length;i+=4){
-let avg=(data[i]+data[i+1]+data[i+2])/3;
-data[i]=data[i+1]=data[i+2]=avg;
-}
-
-ctx.putImageData(d,0,0);
-}
-
-function blurImg(){
-ctx.filter="blur(3px)";
-ctx.drawImage(canvas,0,0);
-ctx.filter="none";
-}
-
-function bg(){
-let g=ctx.createLinearGradient(0,0,300,300);
-g.addColorStop(0,"#00c853");
-g.addColorStop(1,"#2196f3");
-
-ctx.fillStyle=g;
-ctx.fillRect(0,0,300,300);
-ctx.drawImage(img,0,0,300,300);
-}
-
-function downloadImg(){
-let a=document.createElement("a");
-a.href=canvas.toDataURL();
-a.download="image.png";
-a.click();
-}
-
-/* PDF */
-function downloadPDF(){
-let text=document.getElementById("pdfText").value;
-let blob=new Blob([text],{type:"application/pdf"});
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="file.pdf";
-a.click();
-}
-
-/* BLOG */
-async function generateBlog(){
-let topic=document.getElementById("blogInput").value;
 
 let res=await fetch("/api/ai",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:"SEO blog: "+topic})
+body:JSON.stringify({prompt:text})
 });
 
 let data=await res.json();
+chatbox.innerHTML+=`<div class="msg bot">${data.reply}</div>`;
+}
 
+/* BLOG */
+async function generateBlog(){
+let t=document.getElementById("blogInput").value;
+
+let res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:"SEO blog: "+t})
+});
+
+let data=await res.json();
 document.getElementById("blogOut").innerHTML=data.reply;
 }
 
-/* TRANSLATE (FREE AI API) */
+/* TRANSLATE */
 async function translateText(){
-let text=document.getElementById("fromText").value;
-let lang=document.getElementById("toLang").value;
+let t=document.getElementById("text").value;
+let l=document.getElementById("lang").value;
 
-if(!text) return;
-
-const res=await fetch("/api/ai",{
+let res=await fetch("/api/ai",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:`Translate this into ${lang}: ${text}`})
+body:JSON.stringify({prompt:`Translate to ${l}: ${t}`})
 });
 
-const data=await res.json();
+let data=await res.json();
+document.getElementById("out").innerHTML=data.reply;
+}
 
-document.getElementById("outText").innerHTML=data.reply;
+/* PDF */
+function makePDF(){
+let t=document.getElementById("pdfText").value;
+let b=new Blob([t],{type:"application/pdf"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(b);
+a.download="file.pdf";
+a.click();
+}
+
+/* IMAGE */
+let c=document.getElementById("c");
+let ctx=c.getContext("2d");
+let img=new Image();
+
+function loadImg(e){
+let r=new FileReader();
+r.onload=()=>{img.src=r.result};
+img.onload=()=>{c.width=300;c.height=300;ctx.drawImage(img,0,0,300,300);}
+r.readAsDataURL(e.target.files[0]);
+}
+
+function gray(){
+let d=ctx.getImageData(0,0,c.width,c.height);
+let a=d.data;
+for(let i=0;i<a.length;i+=4){
+let g=(a[i]+a[i+1]+a[i+2])/3;
+a[i]=a[i+1]=a[i+2]=g;
+}
+ctx.putImageData(d,0,0);
 }
 
 </script>
