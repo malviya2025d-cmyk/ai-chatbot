@@ -2,7 +2,7 @@ async function sendMessage() {
   const input = document.getElementById("input").value;
 
   try {
-    const res = await fetch("https://ai-chatbot-sw21-git-main-malviya2025d-9773s-projects.vercel.app/api/ai", {
+    const res = await fetch("https://ai-chatbot-sw21-b3tzrz019-malviya2025d-9773s-projects.vercel.app/api/ai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
