@@ -6,10 +6,42 @@ export default async function handler(req, res) {
   try {
     const { prompt, lang } = req.body;
 
-    const languageRule =
-      lang === "hindi"
-        ? "Reply only in simple Hindi."
-        : "Reply only in simple English.";
+    let languageRule = "";
+
+    switch (lang) {
+      case "hi":
+        languageRule = "Reply only in Hindi.";
+        break;
+      case "es":
+        languageRule = "Reply only in Spanish.";
+        break;
+      case "fr":
+        languageRule = "Reply only in French.";
+        break;
+      case "de":
+        languageRule = "Reply only in German.";
+        break;
+      case "ar":
+        languageRule = "Reply only in Arabic.";
+        break;
+      case "ru":
+        languageRule = "Reply only in Russian.";
+        break;
+      case "zh":
+        languageRule = "Reply only in Chinese.";
+        break;
+      case "ja":
+        languageRule = "Reply only in Japanese.";
+        break;
+      case "ko":
+        languageRule = "Reply only in Korean.";
+        break;
+      case "pt":
+        languageRule = "Reply only in Portuguese.";
+        break;
+      default:
+        languageRule = "Detect language automatically and reply in same language.";
+    }
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -23,9 +55,12 @@ export default async function handler(req, res) {
           {
             role: "system",
             content: `
-You are a helpful AI chatbot.
+You are a global AI assistant.
 ${languageRule}
-Keep answers short and clear (max 5 lines).
+
+Rules:
+- Keep answers short (max 5 lines)
+- Be helpful and clear
 `
           },
           {
