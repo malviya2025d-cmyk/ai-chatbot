@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
+    return res.status(200).json({ result: "Only POST allowed" });
   }
 
   try {
@@ -22,13 +22,14 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    console.log("API RESPONSE:", data); // debug
+
     res.status(200).json({
-      result: data.choices?.[0]?.message?.content || "No response"
+      result: data.choices?.[0]?.message?.content || "No response from AI"
     });
 
   } catch (error) {
-    res.status(500).json({
-      result: "Error: " + error.message
-    });
+    console.log("ERROR:", error);
+    res.status(200).json({ result: "Error: " + error.message });
   }
 }
