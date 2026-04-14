@@ -4,7 +4,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt } = req.body;
+    const { prompt, lang } = req.body;
+
+    const languageRule =
+      lang === "hindi"
+        ? "Reply only in simple Hindi."
+        : "Reply only in simple English.";
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -14,15 +19,28 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
-        messages: [{ role: "user", content: prompt }]
+        messages: [
+          {
+            role: "system",
+            content: `
+You are a helpful AI chatbot.
+${languageRule}
+Keep answers short and clear (max 5 lines).
+`
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(response.status).json({
-        error: data?.error?.message || "Groq API failed"
+      return res.status(500).json({
+        error: data?.error?.message || "AI Error"
       });
     }
 
@@ -31,8 +49,6 @@ export default async function handler(req, res) {
     });
 
   } catch (err) {
-    return res.status(500).json({
-      error: err.message || "Server error"
-    });
+    return res.status(500).json({ error: err.message });
   }
 }
