@@ -10,11 +10,17 @@ async function sendMessage() {
       body: JSON.stringify({ prompt: input })
     });
 
+    // 👇 ये IMPORTANT है
+    if (!res.ok) {
+      throw new Error("Server error");
+    }
+
     const data = await res.json();
 
     document.getElementById("output").innerText = data.result;
 
   } catch (err) {
     document.getElementById("output").innerText = "Error: " + err.message;
+    console.error(err);
   }
 }
