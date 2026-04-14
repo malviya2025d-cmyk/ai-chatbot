@@ -1,65 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Chatbot</title>
-  <link rel="stylesheet" href="style.css">
+  <title>AI Chatbot Pro</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
       background: linear-gradient(135deg,#0f0f0f,#1a1a1a);
-      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      color: white;
     }
 
     .chat-box {
-      width: 360px;
-      height: 500px;
+      width: 380px;
+      height: 520px;
       background: #1e1e1e;
       border-radius: 15px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 0 20px rgba(0,255,120,0.3);
-      position: relative;
     }
 
-    /* 🔥 Animated AI Avatar */
-    .avatar {
-      width: 100%;
-      height: 120px;
-      background: radial-gradient(circle,#00c853,#0f0f0f);
+    .header {
+      padding: 10px;
+      background: #00c853;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      animation: pulse 2s infinite;
     }
 
-    .avatar span {
-      font-size: 40px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 10px #00c853; }
-      50% { box-shadow: 0 0 30px #00c853; }
-      100% { box-shadow: 0 0 10px #00c853; }
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
+    select {
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
     }
 
     #chat {
       flex: 1;
       padding: 10px;
       overflow-y: auto;
+    }
+
+    .msg {
+      margin: 6px 0;
     }
 
     .input-box {
@@ -82,8 +70,10 @@
       cursor: pointer;
     }
 
-    .msg {
-      margin: 5px 0;
+    .typing {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-left: 10px;
     }
   </style>
 </head>
@@ -92,13 +82,21 @@
 
 <div class="chat-box">
 
-  <!-- 🔥 Animated AI Avatar -->
-  <div class="avatar">
-    <span>🤖 AI</span>
+  <!-- HEADER -->
+  <div class="header">
+    🤖 AI Chatbot
+    <select id="lang">
+      <option value="english">English</option>
+      <option value="hindi">Hindi</option>
+    </select>
   </div>
 
+  <!-- CHAT -->
   <div id="chat"></div>
 
+  <div id="typing" class="typing"></div>
+
+  <!-- INPUT -->
   <div class="input-box">
     <input id="input" placeholder="Type message..." />
     <button onclick="sendMessage()">Send</button>
@@ -106,7 +104,45 @@
 
 </div>
 
-<script src="script.js"></script>
+<script>
+async function sendMessage() {
+  const inputEl = document.getElementById("input");
+  const input = inputEl.value.trim();
+  const chat = document.getElementById("chat");
+  const typing = document.getElementById("typing");
+  const lang = document.getElementById("lang").value;
+
+  if (!input) return;
+
+  chat.innerHTML += `<div class="msg"><b>You:</b> ${input}</div>`;
+  inputEl.value = "";
+
+  typing.innerText = "AI is typing... ⏳";
+
+  const res = await fetch("/api/ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      prompt: input,
+      lang: lang
+    })
+  });
+
+  const data = await res.json();
+
+  typing.innerText = "";
+
+  if (data.error) {
+    chat.innerHTML += `<div class="msg"><b>Bot:</b> ${data.error}</div>`;
+  } else {
+    chat.innerHTML += `<div class="msg"><b>Bot:</b> ${data.reply}</div>`;
+  }
+
+  chat.scrollTop = chat.scrollHeight;
+}
+</script>
 
 </body>
 </html>
