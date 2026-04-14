@@ -1,39 +1,18 @@
-<script>
-function show(id) {
-  document.querySelectorAll(".card").forEach(c => c.style.display = "none");
-  document.getElementById(id).style.display = "block";
-}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Chatbot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-async function sendMessage() {
-  const inputEl = document.getElementById("input");
-  const input = inputEl.value.trim();
-  const box = document.getElementById("chat-box");
+  <div class="chat-box">
+    <div id="chat"></div>
 
-  if (!input) return;
+    <input id="input" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
-  box.innerHTML += `<p><b>You:</b> ${input}</p>`;
-  inputEl.value = "";
-
-  try {
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: input })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      box.innerHTML += `<p style="color:red;"><b>Error:</b> ${data.error}</p>`;
-      return;
-    }
-
-    box.innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
-
-  } catch (err) {
-    box.innerHTML += `<p style="color:red;"><b>Error:</b> Network issue</p>`;
-  }
-
-  box.scrollTop = box.scrollHeight;
-}
-</script>
+  <script src="script.js"></script>
+</body>
+</html>
