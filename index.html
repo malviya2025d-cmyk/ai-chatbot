@@ -1,97 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Global AI Chatbot</title>
+  <title>AI SaaS Business Platform</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
-      background: linear-gradient(135deg,#0f0f0f,#1a1a1a);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: #0d0d0d;
       color: white;
-    }
-
-    .chat-box {
-      width: 400px;
-      height: 560px;
-      background: #1e1e1e;
-      border-radius: 15px;
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,255,120,0.3);
     }
 
-    .header {
-      padding: 10px;
-      background: #00c853;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: bold;
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      height: 100vh;
+      background: #151515;
+      padding: 20px;
+      position: fixed;
     }
 
-    select {
-      padding: 5px;
-      border-radius: 5px;
-      border: none;
+    .sidebar h2 {
+      color: #00ff88;
     }
 
-    #chat {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-    }
-
-    .msg {
-      margin: 6px 0;
-    }
-
-    .typing {
-      font-size: 12px;
-      opacity: 0.7;
-      padding-left: 10px;
-    }
-
-    .input-box {
-      display: flex;
-      border-top: 1px solid #333;
-    }
-
-    input {
-      flex: 1;
+    .menu a {
+      display: block;
       padding: 12px;
+      margin: 8px 0;
+      background: #222;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .menu a:hover {
+      background: #00ff88;
+      color: black;
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: 260px;
+      padding: 20px;
+      width: 100%;
+    }
+
+    .card {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
       border: none;
       outline: none;
     }
 
     button {
-      padding: 12px;
-      background: #00c853;
+      padding: 10px;
+      margin-top: 10px;
+      background: #00ff88;
       border: none;
-      color: white;
       cursor: pointer;
+      font-weight: bold;
     }
 
-    .mic {
-      background: #ff9800;
+    #chatbox {
+      height: 250px;
+      overflow-y: auto;
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    img {
+      max-width: 100%;
+      margin-top: 10px;
+    }
+
+    .hidden { display: none; }
+
+    /* HERO */
+    .hero {
+      padding: 30px;
+      background: linear-gradient(135deg,#00ff88,#0066ff);
+      color: black;
+      border-radius: 12px;
     }
   </style>
 </head>
 
 <body>
 
-<div class="chat-box">
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>🚀 AI SaaS Pro</h2>
 
-  <!-- HEADER -->
-  <div class="header">
-    🤖 Global AI
+  <div class="menu">
+    <a onclick="show('home')">🏠 Home</a>
+    <a onclick="show('chat')">🤖 AI Chat</a>
+    <a onclick="show('pdf')">📄 PDF Tool</a>
+    <a onclick="show('img')">🖼️ Image Tool</a>
+    <a onclick="show('blog')">✍️ Blog AI</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HOME -->
+  <div id="home" class="card">
+    <div class="hero">
+      <h1>🔥 Build & Earn with AI Tools</h1>
+      <p>All-in-one AI SaaS Platform (Chat + Blog + PDF + Image)</p>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat" class="card hidden">
+    <h2>🤖 AI Chat (Global)</h2>
+
     <select id="lang">
-      <option value="auto">🌍 Auto</option>
+      <option value="auto">Auto Detect</option>
       <option value="en">English</option>
       <option value="hi">Hindi</option>
       <option value="es">Spanish</option>
@@ -99,65 +137,105 @@
       <option value="de">German</option>
       <option value="ar">Arabic</option>
       <option value="ru">Russian</option>
-      <option value="zh">Chinese</option>
-      <option value="ja">Japanese</option>
-      <option value="ko">Korean</option>
-      <option value="pt">Portuguese</option>
     </select>
+
+    <div id="chatbox"></div>
+
+    <input id="input" placeholder="Ask anything..." />
+    <button onclick="sendMessage()">Send</button>
   </div>
 
-  <!-- CHAT -->
-  <div id="chat"></div>
+  <!-- PDF -->
+  <div id="pdf" class="card hidden">
+    <h2>📄 PDF Generator</h2>
 
-  <div class="typing" id="typing"></div>
+    <textarea id="pdfText" rows="6" placeholder="Write content..."></textarea>
+    <button onclick="downloadPDF()">Download PDF</button>
+  </div>
 
-  <!-- INPUT -->
-  <div class="input-box">
-    <input id="input" placeholder="Type or speak..." />
-    <button class="mic" onclick="startVoice()">🎤</button>
-    <button onclick="sendMessage()">Send</button>
+  <!-- IMAGE -->
+  <div id="img" class="card hidden">
+    <h2>🖼️ Image Tool</h2>
+
+    <input type="file" onchange="previewImage(event)" />
+    <img id="preview" />
+  </div>
+
+  <!-- BLOG -->
+  <div id="blog" class="card hidden">
+    <h2>✍️ AI Blog Generator</h2>
+
+    <input id="blogInput" placeholder="Enter topic..." />
+    <button onclick="generateBlog()">Generate Blog</button>
+
+    <div id="blogOutput"></div>
   </div>
 
 </div>
 
 <script>
+function show(id) {
+  document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+/* ================= AI CHAT ================= */
 async function sendMessage() {
-  const inputEl = document.getElementById("input");
-  const input = inputEl.value.trim();
-  const chat = document.getElementById("chat");
+  const input = document.getElementById("input").value;
+  const chatbox = document.getElementById("chatbox");
   const lang = document.getElementById("lang").value;
 
   if (!input) return;
 
-  chat.innerHTML += `<div class="msg"><b>You:</b> ${input}</div>`;
-  inputEl.value = "";
-
-  document.getElementById("typing").innerText = "AI is typing... ⏳";
+  chatbox.innerHTML += `<p><b>You:</b> ${input}</p>`;
 
   const res = await fetch("/api/ai", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: input, lang: lang })
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ prompt: input, lang })
   });
 
   const data = await res.json();
 
-  document.getElementById("typing").innerText = "";
-
-  chat.innerHTML += `<div class="msg"><b>Bot:</b> ${data.reply || data.error}</div>`;
-  chat.scrollTop = chat.scrollHeight;
+  chatbox.innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
 }
 
-/* 🎤 VOICE INPUT */
-function startVoice() {
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = "en-US";
+/* ================= PDF ================= */
+function downloadPDF() {
+  const text = document.getElementById("pdfText").value;
 
-  recognition.onresult = function(event) {
-    document.getElementById("input").value = event.results[0][0].transcript;
+  const blob = new Blob([text], { type: "application/pdf" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ai-file.pdf";
+  a.click();
+}
+
+/* ================= IMAGE ================= */
+function previewImage(event) {
+  const reader = new FileReader();
+  reader.onload = function() {
+    document.getElementById("preview").src = reader.result;
   };
+  reader.readAsDataURL(event.target.files[0]);
+}
 
-  recognition.start();
+/* ================= BLOG ================= */
+async function generateBlog() {
+  const topic = document.getElementById("blogInput").value;
+
+  const res = await fetch("/api/ai", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      prompt: "Write SEO friendly blog on: " + topic
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("blogOutput").innerHTML =
+    `<p>${data.reply}</p>`;
 }
 </script>
 
