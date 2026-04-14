@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Chat + Canva Editor</title>
+  <title>AI Tools Hub</title>
 
   <style>
     body {
@@ -11,50 +11,40 @@
       color: white;
     }
 
-    /* TOP BAR */
-    .topbar {
-      background: #111;
-      padding: 10px;
+    /* TOP MENU */
+    .top {
       display: flex;
-      justify-content: center;
       gap: 10px;
+      padding: 10px;
+      background: #111;
       position: sticky;
       top: 0;
     }
 
-    button {
-      padding: 10px 15px;
+    .top button {
+      padding: 10px;
       border: none;
-      cursor: pointer;
       background: #00c853;
-      color: black;
+      cursor: pointer;
       font-weight: bold;
-      border-radius: 6px;
     }
 
     .container {
       padding: 20px;
     }
 
-    .box {
+    .tool {
       display: none;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
     }
 
     .active {
       display: block;
     }
 
-    /* CHAT */
-    #chatbox {
-      height: 300px;
-      overflow-y: auto;
-      background: #1e1e1e;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    input, select {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
@@ -62,76 +52,95 @@
       outline: none;
     }
 
-    /* CANVA */
+    button {
+      padding: 10px;
+      margin-top: 10px;
+      background: #00c853;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
     canvas {
       max-width: 100%;
-      background: #111;
-      border-radius: 10px;
       margin-top: 10px;
+      background: #111;
     }
   </style>
 </head>
 
 <body>
 
-<!-- TOP BUTTONS -->
-<div class="topbar">
+<!-- MENU -->
+<div class="top">
   <button onclick="show('chat')">🤖 AI Chat</button>
-  <button onclick="show('editor')">🎨 Canva Editor</button>
+  <button onclick="show('canva')">🎨 Image Editor</button>
+  <button onclick="show('pdf')">📄 PDF Tool</button>
+  <button onclick="show('blog')">✍️ Blog AI</button>
 </div>
 
 <div class="container">
 
-  <!-- CHAT BOX -->
-  <div id="chat" class="box active">
-    <h2>🤖 AI Chatbot</h2>
+<!-- CHAT TOOL -->
+<div id="chat" class="tool active">
+  <h2>🤖 AI Chat Tool</h2>
 
-    <select id="lang">
-      <option value="auto">Auto</option>
-      <option value="en">English</option>
-      <option value="hi">Hindi</option>
-      <option value="es">Spanish</option>
-      <option value="fr">French</option>
-    </select>
+  <select id="lang">
+    <option value="auto">Auto</option>
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="es">Spanish</option>
+  </select>
 
-    <div id="chatbox"></div>
+  <div id="chatbox"></div>
 
-    <input id="input" placeholder="Ask something..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+  <input id="input" placeholder="Ask AI..." />
+  <button onclick="sendChat()">Send</button>
+</div>
 
-  <!-- CANVA EDITOR -->
-  <div id="editor" class="box">
-    <h2>🎨 Canva Style Editor (Free)</h2>
+<!-- CANVA TOOL -->
+<div id="canva" class="tool">
+  <h2>🎨 Image Editor Tool</h2>
 
-    <input type="file" onchange="loadImage(event)" />
+  <input type="file" onchange="loadImage(event)" />
+  <canvas id="canvas"></canvas>
 
-    <br><br>
+  <button onclick="gray()">Grayscale</button>
+  <button onclick="blurImg()">Blur</button>
+  <button onclick="bg()">Background</button>
+  <button onclick="downloadImg()">Download</button>
+</div>
 
-    <canvas id="canvas"></canvas>
+<!-- PDF TOOL -->
+<div id="pdf" class="tool">
+  <h2>📄 PDF Tool</h2>
 
-    <br>
+  <textarea id="pdfText" rows="6" placeholder="Write text..."></textarea>
+  <button onclick="downloadPDF()">Download PDF</button>
+</div>
 
-    <button onclick="gray()">Grayscale</button>
-    <button onclick="blurImg()">Blur</button>
-    <button onclick="bright()">Brightness</button>
-    <button onclick="bg()">Background</button>
-    <button onclick="resetImg()">Reset</button>
-    <button onclick="downloadImg()">Download</button>
-  </div>
+<!-- BLOG TOOL -->
+<div id="blog" class="tool">
+  <h2>✍️ Blog AI Tool</h2>
+
+  <input id="blogInput" placeholder="Enter topic..." />
+  <button onclick="generateBlog()">Generate</button>
+
+  <div id="blogOut"></div>
+</div>
 
 </div>
 
 <script>
 
-/* PAGE SWITCH */
+/* SWITCH TOOLS */
 function show(id) {
-  document.querySelectorAll('.box').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-/* ================= CHAT ================= */
-async function sendMessage() {
+/* ================= AI CHAT ================= */
+async function sendChat() {
   const input = document.getElementById("input").value;
   const chatbox = document.getElementById("chatbox");
   const lang = document.getElementById("lang").value;
@@ -157,75 +166,80 @@ let ctx = canvas.getContext("2d");
 let img = new Image();
 let original = null;
 
-/* LOAD */
 function loadImage(event) {
   const reader = new FileReader();
 
   reader.onload = function() {
     img = new Image();
-
     img.onload = function() {
-      canvas.width = 350;
-      canvas.height = 350;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      original = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      canvas.width = 300;
+      canvas.height = 300;
+      ctx.drawImage(img, 0, 0, 300, 300);
+      original = ctx.getImageData(0,0,300,300);
     };
-
     img.src = reader.result;
   };
 
   reader.readAsDataURL(event.target.files[0]);
 }
 
-/* RESET */
-function resetImg() {
-  ctx.putImageData(original, 0, 0);
-}
-
-/* GRAY */
 function gray() {
   let d = ctx.getImageData(0,0,canvas.width,canvas.height);
   let data = d.data;
 
-  for (let i=0;i<data.length;i+=4) {
+  for(let i=0;i<data.length;i+=4){
     let avg = (data[i]+data[i+1]+data[i+2])/3;
     data[i]=data[i+1]=data[i+2]=avg;
   }
-
   ctx.putImageData(d,0,0);
 }
 
-/* BLUR */
 function blurImg() {
-  ctx.filter = "blur(3px)";
+  ctx.filter="blur(3px)";
   ctx.drawImage(canvas,0,0);
-  ctx.filter = "none";
+  ctx.filter="none";
 }
 
-/* BRIGHT */
-function bright() {
-  ctx.filter = "brightness(1.5)";
-  ctx.drawImage(canvas,0,0);
-  ctx.filter = "none";
-}
-
-/* BACKGROUND */
 function bg() {
   let g = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
   g.addColorStop(0,"#00c853");
   g.addColorStop(1,"#2196f3");
 
-  ctx.fillStyle = g;
+  ctx.fillStyle=g;
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  ctx.drawImage(img,0,0,300,300);
 }
 
-/* DOWNLOAD */
 function downloadImg() {
   const a = document.createElement("a");
-  a.download = "canvas.png";
   a.href = canvas.toDataURL();
+  a.download = "image.png";
   a.click();
+}
+
+/* ================= PDF ================= */
+function downloadPDF() {
+  const text = document.getElementById("pdfText").value;
+  const blob = new Blob([text], {type:"application/pdf"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "file.pdf";
+  a.click();
+}
+
+/* ================= BLOG ================= */
+async function generateBlog() {
+  const topic = document.getElementById("blogInput").value;
+
+  const res = await fetch("/api/ai", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ prompt: "Write SEO blog on: "+topic })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("blogOut").innerHTML = data.reply;
 }
 
 </script>
