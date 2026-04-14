@@ -1,7 +1,5 @@
 export default async function handler(req, res) {
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
-
   if (req.method !== "POST") {
     return res.status(200).json({ result: "Only POST allowed" });
   }
@@ -21,25 +19,17 @@ export default async function handler(req, res) {
       })
     });
 
-    const text = await response.text(); // 👈 पहले text लो
+    const data = await response.json();
 
-    try {
-      const data = JSON.parse(text); // 👈 फिर parse करो
-
-      return res.status(200).json({
-        result: data.choices?.[0]?.message?.content || "No response"
-      });
-
-    } catch {
-      // 👇 अगर JSON नहीं है तो error दिखाओ
-      return res.status(500).json({
-        result: "API Error: " + text
-      });
-    }
+    // 👇 DEBUG RETURN
+    return res.status(200).json({
+      debug: data,   // 👈 पूरा response दिखेगा
+      result: data.choices?.[0]?.message?.content || "No response"
+    });
 
   } catch (err) {
     return res.status(500).json({
-      result: "Server Error: " + err.message
+      result: "Error: " + err.message
     });
   }
 }
