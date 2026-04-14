@@ -1,29 +1,28 @@
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(page).classList.add("active");
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.style.display = sidebar.style.display === "none" ? "block" : "none";
+}
+
 async function send() {
-  const inputField = document.getElementById("input");
+  const input = document.getElementById("input").value;
   const chatbox = document.getElementById("chatbox");
 
-  const message = inputField.value;
+  chatbox.innerHTML += `<p><b>You:</b> ${input}</p>`;
 
-  if (!message) return;
+  const res = await fetch("/api/ai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ prompt: input })
+  });
 
-  chatbox.innerHTML += `<p style="color:green;"><b>You:</b> ${message}</p>`;
-  inputField.value = "";
+  const data = await res.json();
 
-  try {
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ prompt: message })
-    });
-
-    const data = await res.json();
-
-    chatbox.innerHTML += `<p style="color:blue;"><b>AI:</b> ${data.result}</p>`;
-  } catch (error) {
-    chatbox.innerHTML += `<p style="color:red;">Error: ${error.message}</p>`;
-  }
-
-  chatbox.scrollTop = chatbox.scrollHeight;
+  chatbox.innerHTML += `<p><b>AI:</b> ${data.result}</p>`;
 }
