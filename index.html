@@ -1,185 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>AI Tools Dashboard</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0f0f0f;
-      color: white;
-      display: flex;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 220px;
-      background: #1e1e1e;
-      height: 100vh;
-      padding: 20px;
-      position: fixed;
-    }
-
-    .sidebar h2 {
-      color: #00c853;
-    }
-
-    .menu a {
-      display: block;
-      color: white;
-      padding: 12px;
-      text-decoration: none;
-      margin: 5px 0;
-      background: #2a2a2a;
-      border-radius: 6px;
-    }
-
-    .menu a:hover {
-      background: #00c853;
-    }
-
-    /* Main */
-    .main {
-      margin-left: 240px;
-      padding: 20px;
-      width: 100%;
-    }
-
-    .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .tool {
-      background: #2a2a2a;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .tool:hover {
-      background: #00c853;
-      color: black;
-    }
-
-    /* Chat Box */
-    #chat-box {
-      display: none;
-      background: #222;
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    input, button {
-      padding: 10px;
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    button {
-      background: #00c853;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
-</head>
-
-<body>
-
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <h2>🔥 AI Dashboard</h2>
-
-  <div class="menu">
-    <a href="#" onclick="show('chat')">🤖 AI Chat</a>
-    <a href="#" onclick="show('pdf')">📄 PDF Tools</a>
-    <a href="#" onclick="show('img')">🖼️ Image Tools</a>
-    <a href="#" onclick="show('blog')">✍️ Blog</a>
-  </div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- HOME -->
-  <div id="home" class="card">
-    <h1>Welcome to AI Tools Dashboard 🚀</h1>
-    <p>Select a tool from sidebar</p>
-
-    <div class="grid">
-      <div class="tool" onclick="show('chat')">AI Chat</div>
-      <div class="tool" onclick="show('pdf')">PDF Tools</div>
-      <div class="tool" onclick="show('img')">Image Tools</div>
-      <div class="tool" onclick="show('blog')">Blog Tools</div>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="chat" class="card" style="display:none;">
-    <h2>🤖 AI Chat</h2>
-
-    <div id="chat-box"></div>
-
-    <input id="input" placeholder="Ask something..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
-
-  <!-- PDF -->
-  <div id="pdf" class="card" style="display:none;">
-    <h2>📄 PDF Tools</h2>
-    <p>Coming soon: PDF merge, split, compress</p>
-  </div>
-
-  <!-- IMAGE -->
-  <div id="img" class="card" style="display:none;">
-    <h2>🖼️ Image Tools</h2>
-    <p>Coming soon: background remover, resize</p>
-  </div>
-
-  <!-- BLOG -->
-  <div id="blog" class="card" style="display:none;">
-    <h2>✍️ Blog Tools</h2>
-    <p>Coming soon: AI blog generator</p>
-  </div>
-
-</div>
-
 <script>
 function show(id) {
   document.querySelectorAll(".card").forEach(c => c.style.display = "none");
   document.getElementById(id).style.display = "block";
 }
 
-/* CHAT */
 async function sendMessage() {
-  const input = document.getElementById("input").value;
+  const inputEl = document.getElementById("input");
+  const input = inputEl.value.trim();
   const box = document.getElementById("chat-box");
 
+  if (!input) return;
+
   box.innerHTML += `<p><b>You:</b> ${input}</p>`;
+  inputEl.value = "";
 
-  const res = await fetch("/api/ai", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ prompt: input })
-  });
+  try {
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: input })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  box.innerHTML += `<p><b>Bot:</b> ${data.reply || data.error}</p>`;
-  document.getElementById("input").value = "";
+    if (!res.ok) {
+      box.innerHTML += `<p style="color:red;"><b>Error:</b> ${data.error}</p>`;
+      return;
+    }
+
+    box.innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
+
+  } catch (err) {
+    box.innerHTML += `<p style="color:red;"><b>Error:</b> Network issue</p>`;
+  }
+
+  box.scrollTop = box.scrollHeight;
 }
 </script>
-
-</body>
-</html>
