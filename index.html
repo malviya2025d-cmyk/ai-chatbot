@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Chatbot Pro</title>
+  <title>Global AI Chatbot</title>
 
   <style>
     body {
@@ -16,14 +16,14 @@
     }
 
     .chat-box {
-      width: 380px;
-      height: 520px;
+      width: 400px;
+      height: 560px;
       background: #1e1e1e;
       border-radius: 15px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,255,120,0.3);
+      box-shadow: 0 0 25px rgba(0,255,120,0.3);
     }
 
     .header {
@@ -32,6 +32,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-weight: bold;
     }
 
     select {
@@ -48,6 +49,12 @@
 
     .msg {
       margin: 6px 0;
+    }
+
+    .typing {
+      font-size: 12px;
+      opacity: 0.7;
+      padding-left: 10px;
     }
 
     .input-box {
@@ -70,10 +77,8 @@
       cursor: pointer;
     }
 
-    .typing {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-left: 10px;
+    .mic {
+      background: #ff9800;
     }
   </style>
 </head>
@@ -84,21 +89,32 @@
 
   <!-- HEADER -->
   <div class="header">
-    🤖 AI Chatbot
+    🤖 Global AI
     <select id="lang">
-      <option value="english">English</option>
-      <option value="hindi">Hindi</option>
+      <option value="auto">🌍 Auto</option>
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+      <option value="es">Spanish</option>
+      <option value="fr">French</option>
+      <option value="de">German</option>
+      <option value="ar">Arabic</option>
+      <option value="ru">Russian</option>
+      <option value="zh">Chinese</option>
+      <option value="ja">Japanese</option>
+      <option value="ko">Korean</option>
+      <option value="pt">Portuguese</option>
     </select>
   </div>
 
   <!-- CHAT -->
   <div id="chat"></div>
 
-  <div id="typing" class="typing"></div>
+  <div class="typing" id="typing"></div>
 
   <!-- INPUT -->
   <div class="input-box">
-    <input id="input" placeholder="Type message..." />
+    <input id="input" placeholder="Type or speak..." />
+    <button class="mic" onclick="startVoice()">🎤</button>
     <button onclick="sendMessage()">Send</button>
   </div>
 
@@ -109,7 +125,6 @@ async function sendMessage() {
   const inputEl = document.getElementById("input");
   const input = inputEl.value.trim();
   const chat = document.getElementById("chat");
-  const typing = document.getElementById("typing");
   const lang = document.getElementById("lang").value;
 
   if (!input) return;
@@ -117,30 +132,32 @@ async function sendMessage() {
   chat.innerHTML += `<div class="msg"><b>You:</b> ${input}</div>`;
   inputEl.value = "";
 
-  typing.innerText = "AI is typing... ⏳";
+  document.getElementById("typing").innerText = "AI is typing... ⏳";
 
   const res = await fetch("/api/ai", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      prompt: input,
-      lang: lang
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: input, lang: lang })
   });
 
   const data = await res.json();
 
-  typing.innerText = "";
+  document.getElementById("typing").innerText = "";
 
-  if (data.error) {
-    chat.innerHTML += `<div class="msg"><b>Bot:</b> ${data.error}</div>`;
-  } else {
-    chat.innerHTML += `<div class="msg"><b>Bot:</b> ${data.reply}</div>`;
-  }
-
+  chat.innerHTML += `<div class="msg"><b>Bot:</b> ${data.reply || data.error}</div>`;
   chat.scrollTop = chat.scrollHeight;
+}
+
+/* 🎤 VOICE INPUT */
+function startVoice() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "en-US";
+
+  recognition.onresult = function(event) {
+    document.getElementById("input").value = event.results[0][0].transcript;
+  };
+
+  recognition.start();
 }
 </script>
 
