@@ -2,6 +2,8 @@
 <html>
 <head>
 
+<meta charset="UTF-8">
+
 <title>AI Tools Hub Pro</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,33 +24,103 @@ gtag('config', 'G-E48LS72B74');
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;}
-header{display:flex;flex-wrap:wrap;gap:5px;padding:10px;background:#111;}
-header button{flex:1;padding:10px;background:#00c853;border:none;border-radius:6px;font-weight:bold;}
-.container{padding:10px;}
-.tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px;}
-.active{display:block;}
-input,textarea,select{width:100%;padding:10px;margin-top:10px;border:none;border-radius:6px;}
-button{margin-top:10px;cursor:pointer;}
-
-#chatbox{
-height:350px;
-overflow:auto;
+body{
+margin:0;
+font-family: Arial, "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 background:#0f0f0f;
-padding:10px;
-border-radius:10px;
-display:flex;
-flex-direction:column;
-gap:10px;
+color:#fff;
 }
 
-.msg{padding:10px;border-radius:15px;max-width:75%;position:relative;}
-.user{background:#00c853;color:#000;align-self:flex-end;}
-.bot{background:#2a2a2a;}
+header{
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+padding:10px;
+background:#111;
+}
 
-.copyBtn{position:absolute;right:5px;bottom:5px;cursor:pointer;font-size:12px;}
+header button{
+flex:1;
+padding:10px;
+background:#00c853;
+border:none;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+}
 
-canvas{width:100%;margin-top:10px;border-radius:10px;}
+.container{padding:10px;}
+
+.tool{
+display:none;
+background:#1e1e1e;
+padding:15px;
+border-radius:10px;
+}
+
+.active{display:block;}
+
+input,textarea,select{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:6px;
+}
+
+#chatbox{
+height:420px;
+overflow-y:auto;
+background:#0f0f0f;
+padding:15px;
+display:flex;
+flex-direction:column;
+gap:12px;
+border-radius:10px;
+}
+
+.msg{
+padding:12px 16px;
+border-radius:12px;
+max-width:80%;
+line-height:1.5;
+font-size:15px;
+animation:fadeIn 0.3s ease;
+position:relative;
+}
+
+.user{
+background:#00c853;
+color:#000;
+align-self:flex-end;
+border-bottom-right-radius:4px;
+}
+
+.bot{
+background:#1e1e1e;
+align-self:flex-start;
+border-bottom-left-radius:4px;
+}
+
+.copyBtn{
+position:absolute;
+right:6px;
+bottom:6px;
+font-size:12px;
+cursor:pointer;
+color:#aaa;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+canvas{
+width:100%;
+margin-top:10px;
+border-radius:10px;
+}
 </style>
 
 </head>
@@ -56,42 +128,41 @@ canvas{width:100%;margin-top:10px;border-radius:10px;}
 <body>
 
 <header>
-<button onclick="show('chat')">🤖 Chat</button>
-<button onclick="show('blog')">✍️ Blog</button>
-<button onclick="show('trans')">🌍 Translate</button>
-<button onclick="show('pdf')">📄 PDF</button>
-<button onclick="show('img')">🎨 Image</button>
+<button onclick="show('chat')">Chat</button>
+<button onclick="show('blog')">Blog</button>
+<button onclick="show('trans')">Translate</button>
+<button onclick="show('pdf')">PDF</button>
+<button onclick="show('img')">Image</button>
 </header>
 
 <div class="container">
 
 <!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>AI Chat Pro</h2>
+<h2>AI Chat</h2>
 
 <select id="lang">
-<option value="auto">🌐 Auto</option>
+<option value="auto">Auto</option>
 <option value="en">English</option>
 <option value="hi">Hindi</option>
 <option value="es">Spanish</option>
 <option value="fr">French</option>
 <option value="de">German</option>
-<option value="ar">Arabic</option>
 <option value="ru">Russian</option>
 <option value="zh">Chinese</option>
-<option value="ja">Japanese</option>
+<option value="ar">Arabic</option>
 </select>
 
 <div id="chatbox"></div>
 
-<input id="input" placeholder="Type or speak..." />
+<input id="input" placeholder="Type message..." />
 <button onclick="sendChat()">Send</button>
 </div>
 
 <!-- BLOG -->
 <div id="blog" class="tool">
 <h2>Blog Generator</h2>
-<input id="blogInput">
+<input id="blogInput" placeholder="Topic...">
 <button onclick="generateBlog()">Generate</button>
 <div id="blogOut"></div>
 </div>
@@ -144,33 +215,41 @@ let memory=[];
 const input=document.getElementById("input");
 const chatbox=document.getElementById("chatbox");
 
-input.addEventListener("keypress",e=>{if(e.key==="Enter")sendChat();});
+window.onload=()=>{
+let old=localStorage.getItem("chat");
+if(old) chatbox.innerHTML=old;
+};
 
-function saveChat(){localStorage.setItem("chat",chatbox.innerHTML);}
-window.onload=()=>{let c=localStorage.getItem("chat");if(c)chatbox.innerHTML=c;}
+input.addEventListener("keypress",e=>{
+if(e.key==="Enter") sendChat();
+});
+
+function saveChat(){
+localStorage.setItem("chat",chatbox.innerHTML);
+}
 
 async function sendChat(){
 
 let text=input.value.trim();
-if(!text)return;
+if(!text) return;
 
 memory.push(text);
-if(memory.length>5)memory.shift();
+if(memory.length>5) memory.shift();
 
-chatbox.innerHTML+=`<div class="msg user">🧑 ${text}</div>`;
+chatbox.innerHTML+=`<div class="msg user">${text}</div>`;
 input.value="";
 
 let typing=document.createElement("div");
 typing.className="msg bot";
-typing.innerHTML="🤖 typing...";
+typing.innerHTML="Typing...";
 chatbox.appendChild(typing);
 
 let res=await fetch("/api/ai",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-prompt:memory.join("\n")+"User:"+text,
-lang:document.getElementById("lang").value
+prompt: memory.join("\n") + "\nUser: " + text,
+lang: document.getElementById("lang").value
 })
 });
 
@@ -178,20 +257,33 @@ let data=await res.json();
 
 typing.remove();
 
-chatbox.innerHTML+=`<div class="msg bot">🤖 ${data.reply}<span class="copyBtn" onclick="copyText(this)">📋</span></div>`;
+let msg=document.createElement("div");
+msg.className="msg bot";
+msg.innerHTML=`${data.reply} <span class="copyBtn" onclick="copyText(this)">📋</span>`;
+
+chatbox.appendChild(msg);
 
 saveChat();
 chatbox.scrollTop=chatbox.scrollHeight;
 }
 
 function copyText(el){
-navigator.clipboard.writeText(el.parentElement.innerText);
+let text=el.parentElement.innerText.replace("📋","");
+navigator.clipboard.writeText(text);
 }
 
 /* BLOG */
 async function generateBlog(){
 let t=document.getElementById("blogInput").value;
-let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"SEO blog:"+t})});
+
+let res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+prompt:`Write SEO blog in ${document.getElementById("lang").value}: `+t
+})
+});
+
 let d=await res.json();
 document.getElementById("blogOut").innerHTML=d.reply;
 }
@@ -200,7 +292,15 @@ document.getElementById("blogOut").innerHTML=d.reply;
 async function translateText(){
 let t=document.getElementById("text").value;
 let l=document.getElementById("lang2").value;
-let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:`Translate to ${l}: ${t}`})});
+
+let res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+prompt:`Translate to ${l}: ${t}`
+})
+});
+
 let d=await res.json();
 document.getElementById("out").innerHTML=d.reply;
 }
@@ -217,7 +317,7 @@ function makePDF(){
 const { jsPDF }=window.jspdf;
 let doc=new jsPDF();
 doc.text(document.getElementById("pdfText").value,10,10);
-if(pdfImg)doc.addImage(pdfImg,"JPEG",10,30,180,100);
+if(pdfImg) doc.addImage(pdfImg,"JPEG",10,30,180,100);
 doc.save("file.pdf");
 }
 
