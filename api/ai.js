@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Only POST allowed" });
   }
@@ -40,28 +41,34 @@ export default async function handler(req, res) {
         languageRule = "Reply only in Portuguese.";
         break;
       default:
-        languageRule = "Detect language automatically and reply in same language.";
+        languageRule = "Detect user's language and reply in same language.";
     }
+
+    const systemPrompt = `
+You are a smart AI assistant.
+
+${languageRule}
+
+Rules:
+- Keep answers clear and natural like ChatGPT
+- Use emojis only when appropriate (😊, ⚠️, 💡 etc)
+- Do NOT overuse emojis
+- Avoid unnecessary symbols or prefixes
+- Keep answers short (max 5-6 lines unless needed)
+`;
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+        "Authorization": \`Bearer \${process.env.GROQ_API_KEY}\`
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
         messages: [
           {
             role: "system",
-            content: `
-You are a global AI assistant.
-${languageRule}
-
-Rules:
-- Keep answers short (max 5 lines)
-- Be helpful and clear
-`
+            content: systemPrompt
           },
           {
             role: "user",
@@ -75,15 +82,19 @@ Rules:
 
     if (!response.ok) {
       return res.status(500).json({
-        error: data?.error?.message || "AI Error"
+        reply: data?.error?.message || "AI Error"
       });
     }
 
-    return res.status(200).json({
-      reply: data?.choices?.[0]?.message?.content || ""
-    });
+    const reply =
+      data?.choices?.[0]?.message?.content?.trim() ||
+      "No response generated.";
+
+    return res.status(200).json({ reply });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({
+      reply: "Server Error: " + err.message
+    });
   }
 }
