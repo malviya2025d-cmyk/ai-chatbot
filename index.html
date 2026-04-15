@@ -3,13 +3,10 @@
 <head>
 
 <title>AI Tools Hub Pro</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- SEO -->
-<meta name="description" content="Free AI Tools Hub - Chat, Blog, Translate, PDF & Image Tools">
-<meta name="keywords" content="ai tools, chat ai, blog generator, translate, pdf tools">
-
-<!-- Analytics -->
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E48LS72B74"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -18,24 +15,26 @@ gtag('js', new Date());
 gtag('config', 'G-E48LS72B74');
 </script>
 
-<!-- Ads -->
+<!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264" crossorigin="anonymous"></script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;}
-header{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#111;}
-header button{flex:1;min-width:120px;padding:10px;border:none;background:#00c853;border-radius:6px;color:#000;font-weight:bold;}
+header{display:flex;flex-wrap:wrap;gap:5px;padding:10px;background:#111;}
+header button{flex:1;padding:10px;background:#00c853;border:none;border-radius:6px;font-weight:bold;}
 .container{padding:10px;}
 .tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px;}
 .active{display:block;}
-input,textarea,select{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none;}
-button{width:100%;padding:10px;margin-top:10px;background:#00c853;border:none;border-radius:6px;font-weight:bold;}
-.ad{background:#222;padding:10px;margin:10px 0;text-align:center;color:#aaa;}
+input,textarea,select{width:100%;padding:10px;margin-top:10px;border:none;border-radius:6px;}
+button{margin-top:10px;cursor:pointer;}
 
 #chatbox{
 height:350px;
-overflow-y:auto;
-background:#000;
+overflow:auto;
+background:#0f0f0f;
 padding:10px;
 border-radius:10px;
 display:flex;
@@ -43,15 +42,13 @@ flex-direction:column;
 gap:10px;
 }
 
-.msg{
-padding:10px 14px;
-border-radius:15px;
-max-width:75%;
-font-size:14px;
-}
-
+.msg{padding:10px;border-radius:15px;max-width:75%;position:relative;}
 .user{background:#00c853;color:#000;align-self:flex-end;}
-.bot{background:#333;align-self:flex-start;}
+.bot{background:#2a2a2a;}
+
+.copyBtn{position:absolute;right:5px;bottom:5px;cursor:pointer;font-size:12px;}
+
+canvas{width:100%;margin-top:10px;border-radius:10px;}
 </style>
 
 </head>
@@ -68,11 +65,9 @@ font-size:14px;
 
 <div class="container">
 
-<div class="ad">🔝 Ad Space</div>
-
 <!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>🤖 AI Chat</h2>
+<h2>AI Chat Pro</h2>
 
 <select id="lang">
 <option value="auto">🌐 Auto</option>
@@ -89,26 +84,27 @@ font-size:14px;
 
 <div id="chatbox"></div>
 
-<input id="input" placeholder="💬 Type message..." />
+<input id="input" placeholder="Type or speak..." />
 <button onclick="sendChat()">Send</button>
 </div>
-
-<div class="ad">💰 Ad Space</div>
 
 <!-- BLOG -->
 <div id="blog" class="tool">
 <h2>Blog Generator</h2>
-<input id="blogInput" placeholder="Topic..." />
+<input id="blogInput">
 <button onclick="generateBlog()">Generate</button>
 <div id="blogOut"></div>
 </div>
 
 <!-- TRANSLATE -->
 <div id="trans" class="tool">
-<h2>Translate AI</h2>
-<input id="text" placeholder="Text..." />
+<h2>Translate</h2>
+<input id="text">
 <select id="lang2">
-<option>en</option><option>hi</option><option>es</option><option>fr</option>
+<option value="en">English</option>
+<option value="hi">Hindi</option>
+<option value="es">Spanish</option>
+<option value="fr">French</option>
 </select>
 <button onclick="translateText()">Translate</button>
 <div id="out"></div>
@@ -117,6 +113,7 @@ font-size:14px;
 <!-- PDF -->
 <div id="pdf" class="tool">
 <h2>PDF Tool</h2>
+<input type="file" accept="image/*" onchange="addImagePDF(event)">
 <textarea id="pdfText"></textarea>
 <button onclick="makePDF()">Download PDF</button>
 </div>
@@ -124,12 +121,13 @@ font-size:14px;
 <!-- IMAGE -->
 <div id="img" class="tool">
 <h2>Image Tool</h2>
-<input type="file" onchange="loadImg(event)">
+<input type="file" accept="image/*" onchange="loadImg(event)">
+<button onclick="gray()">Gray</button>
+<button onclick="invert()">Invert</button>
+<button onclick="rotate()">Rotate</button>
+<button onclick="downloadImg()">Download</button>
 <canvas id="c"></canvas>
-<button onclick="gray()">Grayscale</button>
 </div>
-
-<div class="ad">📊 Footer Ad</div>
 
 </div>
 
@@ -141,78 +139,86 @@ document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 }
 
-/* CHAT FIXED */
-const input = document.getElementById("input");
-const chatbox = document.getElementById("chatbox");
+/* CHAT */
+let memory=[];
+const input=document.getElementById("input");
+const chatbox=document.getElementById("chatbox");
 
-input.addEventListener("keypress", function(e){
-if(e.key==="Enter"){sendChat();}
-});
+input.addEventListener("keypress",e=>{if(e.key==="Enter")sendChat();});
+
+function saveChat(){localStorage.setItem("chat",chatbox.innerHTML);}
+window.onload=()=>{let c=localStorage.getItem("chat");if(c)chatbox.innerHTML=c;}
 
 async function sendChat(){
 
 let text=input.value.trim();
-let lang=document.getElementById("lang").value;
+if(!text)return;
 
-if(!text) return;
+memory.push(text);
+if(memory.length>5)memory.shift();
 
-chatbox.innerHTML += `<div class="msg user">🧑 ${text}</div>`;
-input.value=""; // FIX CLEAR
+chatbox.innerHTML+=`<div class="msg user">🧑 ${text}</div>`;
+input.value="";
 
-chatbox.innerHTML += `<div class="msg bot">🤖 Typing...</div>`;
-chatbox.scrollTop = chatbox.scrollHeight;
+let typing=document.createElement("div");
+typing.className="msg bot";
+typing.innerHTML="🤖 typing...";
+chatbox.appendChild(typing);
 
-const res=await fetch("/api/ai",{
+let res=await fetch("/api/ai",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:text,lang})
+body:JSON.stringify({
+prompt:memory.join("\n")+"User:"+text,
+lang:document.getElementById("lang").value
+})
 });
 
-const data=await res.json();
+let data=await res.json();
 
-chatbox.lastChild.remove();
+typing.remove();
 
-chatbox.innerHTML += `<div class="msg bot">🤖 ${data.reply}</div>`;
-chatbox.scrollTop = chatbox.scrollHeight;
+chatbox.innerHTML+=`<div class="msg bot">🤖 ${data.reply}<span class="copyBtn" onclick="copyText(this)">📋</span></div>`;
+
+saveChat();
+chatbox.scrollTop=chatbox.scrollHeight;
+}
+
+function copyText(el){
+navigator.clipboard.writeText(el.parentElement.innerText);
 }
 
 /* BLOG */
 async function generateBlog(){
 let t=document.getElementById("blogInput").value;
-
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:"SEO blog: "+t})
-});
-
-let data=await res.json();
-document.getElementById("blogOut").innerHTML=data.reply;
+let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"SEO blog:"+t})});
+let d=await res.json();
+document.getElementById("blogOut").innerHTML=d.reply;
 }
 
 /* TRANSLATE */
 async function translateText(){
 let t=document.getElementById("text").value;
 let l=document.getElementById("lang2").value;
-
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:`Translate to ${l}: ${t}`})
-});
-
-let data=await res.json();
-document.getElementById("out").innerHTML=data.reply;
+let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:`Translate to ${l}: ${t}`})});
+let d=await res.json();
+document.getElementById("out").innerHTML=d.reply;
 }
 
 /* PDF */
+let pdfImg=null;
+function addImagePDF(e){
+let r=new FileReader();
+r.onload=()=>pdfImg=r.result;
+r.readAsDataURL(e.target.files[0]);
+}
+
 function makePDF(){
-let t=document.getElementById("pdfText").value;
-let b=new Blob([t],{type:"application/pdf"});
-let a=document.createElement("a");
-a.href=URL.createObjectURL(b);
-a.download="file.pdf";
-a.click();
+const { jsPDF }=window.jspdf;
+let doc=new jsPDF();
+doc.text(document.getElementById("pdfText").value,10,10);
+if(pdfImg)doc.addImage(pdfImg,"JPEG",10,30,180,100);
+doc.save("file.pdf");
 }
 
 /* IMAGE */
@@ -222,7 +228,7 @@ let img=new Image();
 
 function loadImg(e){
 let r=new FileReader();
-r.onload=()=>{img.src=r.result};
+r.onload=()=>img.src=r.result;
 img.onload=()=>{c.width=300;c.height=300;ctx.drawImage(img,0,0,300,300);}
 r.readAsDataURL(e.target.files[0]);
 }
@@ -235,6 +241,30 @@ let g=(a[i]+a[i+1]+a[i+2])/3;
 a[i]=a[i+1]=a[i+2]=g;
 }
 ctx.putImageData(d,0,0);
+}
+
+function invert(){
+let d=ctx.getImageData(0,0,c.width,c.height);
+let a=d.data;
+for(let i=0;i<a.length;i+=4){
+a[i]=255-a[i];
+a[i+1]=255-a[i+1];
+a[i+2]=255-a[i+2];
+}
+ctx.putImageData(d,0,0);
+}
+
+function rotate(){
+ctx.translate(c.width/2,c.height/2);
+ctx.rotate(Math.PI/2);
+ctx.drawImage(img,-150,-150,300,300);
+}
+
+function downloadImg(){
+let a=document.createElement("a");
+a.href=c.toDataURL();
+a.download="image.png";
+a.click();
 }
 
 </script>
