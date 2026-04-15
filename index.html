@@ -2,52 +2,56 @@
 <html>
 <head>
 
-<title>AI Tools Hub Pro - Free AI Chat, Blog, Translate, PDF & Image Tools</title>
-
+<title>AI Tools Hub Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="description" content="Free AI Tools Hub - Chat AI, Blog Generator, Image Editor, PDF Tools and Translate AI. Best free online SaaS platform.">
-<meta name="keywords" content="free ai tools, ai chat, blog generator ai, image editor online, pdf tools, translate ai, seo tools">
-<meta name="robots" content="index, follow">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
-     crossorigin="anonymous"></script>
-<!-- All in one hub -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-8334252996051264"
-     data-ad-slot="8925107286"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-<!-- Google Analytics -->
+<!-- SEO -->
+<meta name="description" content="Free AI Tools Hub - Chat, Blog, Translate, PDF & Image Tools">
+<meta name="keywords" content="ai tools, chat ai, blog generator, translate, pdf tools">
+
+<!-- Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E48LS72B74"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-E48LS72B74');
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-E48LS72B74');
 </script>
 
-<!-- AdSense -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
-crossorigin="anonymous"></script>
+<!-- Ads -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264" crossorigin="anonymous"></script>
 
 <style>
 body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;}
-header{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#111;position:sticky;top:0;z-index:999;}
-header button{flex:1;min-width:120px;padding:10px;border:none;background:#00c853;font-weight:bold;border-radius:6px;cursor:pointer;}
+header{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#111;}
+header button{flex:1;min-width:120px;padding:10px;border:none;background:#00c853;border-radius:6px;color:#000;font-weight:bold;}
 .container{padding:10px;}
 .tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px;}
 .active{display:block;}
-input,textarea,select{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none;outline:none;}
-button{width:100%;padding:10px;margin-top:10px;background:#00c853;border:none;border-radius:6px;font-weight:bold;cursor:pointer;}
-#chatbox{height:300px;overflow:auto;background:#000;padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:8px;}
-.msg{padding:10px;border-radius:10px;max-width:75%;}
-.user{background:#00c853;color:#000;align-self:flex-end;}
-.bot{background:#333;}
+input,textarea,select{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none;}
+button{width:100%;padding:10px;margin-top:10px;background:#00c853;border:none;border-radius:6px;font-weight:bold;}
 .ad{background:#222;padding:10px;margin:10px 0;text-align:center;color:#aaa;}
+
+#chatbox{
+height:350px;
+overflow-y:auto;
+background:#000;
+padding:10px;
+border-radius:10px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.msg{
+padding:10px 14px;
+border-radius:15px;
+max-width:75%;
+font-size:14px;
+}
+
+.user{background:#00c853;color:#000;align-self:flex-end;}
+.bot{background:#333;align-self:flex-start;}
 </style>
 
 </head>
@@ -68,9 +72,24 @@ button{width:100%;padding:10px;margin-top:10px;background:#00c853;border:none;bo
 
 <!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>AI Chat</h2>
+<h2>🤖 AI Chat</h2>
+
+<select id="lang">
+<option value="auto">🌐 Auto</option>
+<option value="en">English</option>
+<option value="hi">Hindi</option>
+<option value="es">Spanish</option>
+<option value="fr">French</option>
+<option value="de">German</option>
+<option value="ar">Arabic</option>
+<option value="ru">Russian</option>
+<option value="zh">Chinese</option>
+<option value="ja">Japanese</option>
+</select>
+
 <div id="chatbox"></div>
-<input id="input" placeholder="Type message..." />
+
+<input id="input" placeholder="💬 Type message..." />
 <button onclick="sendChat()">Send</button>
 </div>
 
@@ -88,7 +107,7 @@ button{width:100%;padding:10px;margin-top:10px;background:#00c853;border:none;bo
 <div id="trans" class="tool">
 <h2>Translate AI</h2>
 <input id="text" placeholder="Text..." />
-<select id="lang">
+<select id="lang2">
 <option>en</option><option>hi</option><option>es</option><option>fr</option>
 </select>
 <button onclick="translateText()">Translate</button>
@@ -122,21 +141,39 @@ document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 }
 
-/* CHAT */
-async function sendChat(){
-let text=document.getElementById("input").value;
-if(!text)return;
+/* CHAT FIXED */
+const input = document.getElementById("input");
+const chatbox = document.getElementById("chatbox");
 
-chatbox.innerHTML+=`<div class="msg user">${text}</div>`;
-
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:text})
+input.addEventListener("keypress", function(e){
+if(e.key==="Enter"){sendChat();}
 });
 
-let data=await res.json();
-chatbox.innerHTML+=`<div class="msg bot">${data.reply}</div>`;
+async function sendChat(){
+
+let text=input.value.trim();
+let lang=document.getElementById("lang").value;
+
+if(!text) return;
+
+chatbox.innerHTML += `<div class="msg user">🧑 ${text}</div>`;
+input.value=""; // FIX CLEAR
+
+chatbox.innerHTML += `<div class="msg bot">🤖 Typing...</div>`;
+chatbox.scrollTop = chatbox.scrollHeight;
+
+const res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:text,lang})
+});
+
+const data=await res.json();
+
+chatbox.lastChild.remove();
+
+chatbox.innerHTML += `<div class="msg bot">🤖 ${data.reply}</div>`;
+chatbox.scrollTop = chatbox.scrollHeight;
 }
 
 /* BLOG */
@@ -156,7 +193,7 @@ document.getElementById("blogOut").innerHTML=data.reply;
 /* TRANSLATE */
 async function translateText(){
 let t=document.getElementById("text").value;
-let l=document.getElementById("lang").value;
+let l=document.getElementById("lang2").value;
 
 let res=await fetch("/api/ai",{
 method:"POST",
