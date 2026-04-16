@@ -11,7 +11,7 @@
 body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
 
 header{display:flex;gap:5px;padding:10px;background:#111}
-header button{flex:1;padding:10px;background:#00c853;border:none;border-radius:6px;color:#000;font-weight:bold;cursor:pointer}
+header button{flex:1;padding:10px;background:#00c853;border:none;border-radius:6px;color:#000;font-weight:bold}
 
 .container{padding:10px}
 .tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px}
@@ -21,6 +21,7 @@ input,textarea,select{
 width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none
 }
 
+/* CHATBOX GLOW */
 #chatbox{
 height:400px;overflow-y:auto;background:#0f0f0f;padding:10px;border-radius:10px;
 border:2px solid transparent;
@@ -36,35 +37,29 @@ animation:glow 3s linear infinite;
 100%{filter:hue-rotate(360deg)}
 }
 
-.msg{
-padding:10px;margin:5px 0;border-radius:10px;max-width:80%;
-animation:fadeUp 0.3s ease
-}
-
+/* MESSAGE */
+.msg{padding:10px;margin:5px 0;border-radius:10px;max-width:80%}
 .user{background:#00c853;color:#000;margin-left:auto}
-.bot{background:#333}
+.bot{background:#1e1e1e;color:#fff;line-height:1.6}
 
-@keyframes fadeUp{
-from{opacity:0;transform:translateY(10px)}
-to{opacity:1;transform:translateY(0)}
-}
+/* FORMAT STYLE */
+.bot h1,.bot h2{color:#00ffcc;margin:10px 0}
+.bot ul{padding-left:20px}
+.bot li{margin:5px 0}
+.bot code{background:#000;padding:4px;border-radius:5px;color:#00ffcc}
+.bot hr{border:0;border-top:1px solid #333;margin:10px 0}
 
+/* POPUP */
 #loadingPopup{
 position:fixed;top:50%;left:50%;
 transform:translate(-50%,-50%);
 background:#111;padding:20px 30px;border-radius:10px;
 display:none;color:#00ffcc;font-weight:bold;
 box-shadow:0 0 20px #00ffcc;
-animation:pulse 1s infinite;
 }
 
-@keyframes pulse{
-0%{opacity:0.5}
-50%{opacity:1}
-100%{opacity:0.5}
-}
-
-.typing{display:flex;gap:5px;padding:10px}
+/* TYPING DOTS */
+.typing{display:flex;gap:5px}
 .typing span{
 width:8px;height:8px;background:#00ffcc;border-radius:50%;
 animation:blink 1.5s infinite;
@@ -75,11 +70,6 @@ animation:blink 1.5s infinite;
 @keyframes blink{
 0%,100%{opacity:0.2}
 50%{opacity:1}
-}
-
-button:hover{
-transform:scale(1.05);
-box-shadow:0 0 10px #00ffcc;
 }
 </style>
 </head>
@@ -112,7 +102,6 @@ box-shadow:0 0 10px #00ffcc;
 <button onclick="sendChat()">Send</button>
 <button onclick="startVoice()">🎤 Speak</button>
 <button onclick="stopVoice()">⛔ Stop</button>
-
 </div>
 
 <!-- TRANSLATE -->
@@ -126,33 +115,20 @@ box-shadow:0 0 10px #00ffcc;
 <option value="hi">Hindi</option>
 <option value="mr">Marathi</option>
 <option value="pa">Punjabi</option>
-<option value="or">Odia</option>
 <option value="bn">Bengali</option>
-<option value="gu">Gujarati</option>
 <option value="ta">Tamil</option>
 <option value="te">Telugu</option>
-<option value="kn">Kannada</option>
-<option value="ml">Malayalam</option>
 <option value="ur">Urdu</option>
 <option value="es">Spanish</option>
 <option value="fr">French</option>
-<option value="de">German</option>
-<option value="ru">Russian</option>
-<option value="zh">Chinese</option>
-<option value="ja">Japanese</option>
-<option value="ko">Korean</option>
-<option value="ar">Arabic</option>
-<option value="pt">Portuguese</option>
 </select>
 
 <button onclick="translateText()">Translate</button>
 
 <hr>
 
-<h3>📸 Image / Camera Translate</h3>
-<input type="file" accept="image/*" capture="camera" onchange="readImage(event)">
+<input type="file" accept="image/*" onchange="readImage(event)">
 <p id="ocrText"></p>
-
 <div id="out"></div>
 </div>
 
@@ -160,134 +136,116 @@ box-shadow:0 0 10px #00ffcc;
 
 <script>
 
-/* TOOL SWITCH */
+/* SWITCH */
 function show(id){
 document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 }
 
-/* MEMORY LOAD */
-let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+/* FORMAT RESPONSE */
+function formatReply(text){
+return text
+.replace(/\n/g,"<br>")
+.replace(/\*\*(.*?)\*\*/g,"<b>$1</b>")
+.replace(/## (.*?)<br>/g,"<h2>$1</h2>")
+.replace(/# (.*?)<br>/g,"<h1>$1</h1>")
+.replace(/- (.*?)<br>/g,"<li>$1</li>")
+.replace(/(<li>.*<\/li>)/g,"<ul>$1</ul>");
+}
+
+/* MEMORY */
+let history=JSON.parse(localStorage.getItem("chatHistory")||"[]");
 
 function loadHistory(){
-history.forEach(msg=>{
-document.getElementById("chatbox").innerHTML+=`<div class="msg ${msg.type}">${msg.text}</div>`;
+history.forEach(m=>{
+let html=m.type==="bot"?formatReply(m.text):m.text;
+chatbox.innerHTML+=`<div class="msg ${m.type}">${html}</div>`;
 });
 }
 loadHistory();
 
 /* CHAT */
 async function sendChat(){
-
-let text=document.getElementById("input").value;
+let input=document.getElementById("input");
+let text=input.value.trim();
 if(!text) return;
 
-document.getElementById("chatbox").innerHTML+=`<div class="msg user">${text}</div>`;
+chatbox.innerHTML+=`<div class="msg user">${text}</div>`;
 history.push({type:"user",text});
 localStorage.setItem("chatHistory",JSON.stringify(history));
 
-document.getElementById("input").value="";
+input.value="";
+loadingPopup.style.display="block";
 
-document.getElementById("loadingPopup").style.display="block";
+let id="t"+Date.now();
+chatbox.innerHTML+=`<div id="${id}" class="msg bot"><div class="typing"><span></span><span></span><span></span></div></div>`;
 
-let typingId="typing"+Date.now();
-document.getElementById("chatbox").innerHTML+=`
-<div id="${typingId}" class="msg bot">
-<div class="typing"><span></span><span></span><span></span></div>
-</div>`;
-
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-prompt:text,
-lang:document.getElementById("lang").value
-})
-});
+let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:text+" format nicely with headings and emojis",lang:lang.value})});
 
 let d=await res.json();
 
-document.getElementById(typingId).remove();
-document.getElementById("loadingPopup").style.display="none";
+document.getElementById(id).remove();
+loadingPopup.style.display="none";
 
-document.getElementById("chatbox").innerHTML+=`<div class="msg bot">${d.reply}</div>`;
+let formatted=formatReply(d.reply);
+
+chatbox.innerHTML+=`<div class="msg bot">${formatted}</div>`;
 history.push({type:"bot",text:d.reply});
 localStorage.setItem("chatHistory",JSON.stringify(history));
 
 speak(d.reply);
 }
 
-/* VOICE INPUT */
-let recognition;
-
-function startVoice(){
-if(!('webkitSpeechRecognition' in window)){
-alert("Voice not supported");
-return;
+/* ENTER FIX */
+input.addEventListener("keydown",e=>{
+if(e.key==="Enter"&&!e.shiftKey){
+e.preventDefault();sendChat();
 }
+});
 
-recognition = new webkitSpeechRecognition();
-recognition.lang = "en-IN";
-recognition.onresult = function(e){
-let t=e.results[0][0].transcript;
-document.getElementById("input").value=t;
+text.addEventListener("keydown",e=>{
+if(e.key==="Enter"){
+e.preventDefault();translateText();
+}
+});
+
+/* VOICE */
+let recognition;
+function startVoice(){
+recognition=new webkitSpeechRecognition();
+recognition.onresult=e=>{
+input.value=e.results[0][0].transcript;
 sendChat();
 };
 recognition.start();
 }
-
-function stopVoice(){
-if(recognition) recognition.stop();
-}
-
-/* VOICE OUTPUT */
-function speak(text){
-let s=new SpeechSynthesisUtterance(text);
-s.lang="en-US";
-window.speechSynthesis.speak(s);
-}
+function stopVoice(){if(recognition)recognition.stop();}
+function speak(t){speechSynthesis.speak(new SpeechSynthesisUtterance(t));}
 
 /* TRANSLATE */
 async function translateText(){
-let t=document.getElementById("text").value;
-let l=document.getElementById("lang2").value;
+let t=text.value;
+let l=lang2.value;
 
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-prompt:`Translate to ${l}: ${t}`
-})
-});
+let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:`Translate to ${l}: ${t}`})});
 
 let d=await res.json();
-document.getElementById("out").innerHTML=d.reply;
+out.innerHTML=d.reply;
 }
 
 /* OCR */
 async function readImage(e){
-const file=e.target.files[0];
-if(!file) return;
+let f=e.target.files[0];
+let r=await Tesseract.recognize(f,"eng+hin");
+ocrText.innerText=r.data.text;
 
-document.getElementById("ocrText").innerText="Reading image...";
-
-const result=await Tesseract.recognize(file,"eng+hin");
-const text=result.data.text;
-
-document.getElementById("ocrText").innerText=text;
-
-let lang=document.getElementById("lang2").value;
-
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-prompt:`Translate to ${lang}: ${text}`
-})
-});
+let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:`Translate: ${r.data.text}`})});
 
 let d=await res.json();
-document.getElementById("out").innerHTML=d.reply;
+out.innerHTML=d.reply;
 }
 
 </script>
