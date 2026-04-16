@@ -5,63 +5,56 @@ background:#0f0f0f;
 color:#fff;
 }
 
-/* HEADER */
 header{
 display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px;
+flex-wrap:wrap;
+justify-content:center;
 background:#111;
-border-bottom:1px solid #333;
+padding:10px;
 }
 
 header button{
+flex:1;
+min-width:80px;
+margin:3px;
+padding:10px;
 background:#222;
 color:#fff;
 border:none;
-padding:10px;
-margin:2px;
-cursor:pointer;
 border-radius:6px;
+cursor:pointer;
 }
 
-/* CONTAINER */
-.container{
-padding:10px;
+header button.active{
+background:#00c3ff;
+color:#000;
 }
 
-/* TOOLS */
 .tool{
 display:none;
-background:#1a1a1a;
 padding:10px;
+margin:10px;
+background:#1a1a1a;
 border-radius:10px;
-margin-bottom:10px;
-box-shadow:0 0 10px rgba(0,255,255,0.2);
 }
 
-/* ACTIVE TOOL */
 .tool.active{
 display:block;
 }
 
-/* CHAT BOX */
 #chatbox{
-height:400px;
-overflow-y:auto;
+height:300px;
+overflow:auto;
 background:#000;
 padding:10px;
 border-radius:10px;
-border:1px solid #333;
 }
 
-/* MESSAGE STYLE */
 .msg{
-margin:8px 0;
 padding:10px;
+margin:5px;
 border-radius:10px;
 max-width:80%;
-line-height:1.4;
 }
 
 .user{
@@ -70,71 +63,32 @@ margin-left:auto;
 }
 
 .bot{
-background:#222;
-margin-right:auto;
+background:#333;
 }
 
-/* INPUT */
-input{
-width:75%;
-padding:10px;
-border:none;
-border-radius:8px;
-outline:none;
-}
-
-button{
-padding:10px;
-border:none;
-border-radius:8px;
-background:#00c3ff;
-color:#000;
-cursor:pointer;
-}
-
-/* 🔥 GLOW EFFECT */
-button:hover{
-box-shadow:0 0 10px #00c3ff, 0 0 20px #00c3ff;
-}
-
-/* 📱 MOBILE FIX */
-@media (max-width: 768px){
-
-header{
-flex-direction:column;
-}
-
-header button{
+input, textarea{
 width:100%;
-margin-bottom:5px;
+padding:10px;
+margin-top:5px;
+border:none;
+border-radius:6px;
+font-size:16px;
 }
 
-.container{
-padding:5px;
+canvas{
+max-width:100%;
+margin-top:10px;
+border-radius:10px;
 }
 
-.tool{
-display:block !important;
-margin-bottom:15px;
+.share{
+display:flex;
+gap:5px;
+margin:10px;
+flex-wrap:wrap;
 }
 
-#chatbox{
-height:300px;
-}
-
-input{
-width:65%;
-font-size:18px;
-padding:12px;
-}
-
-button{
-font-size:18px;
-padding:12px;
-}
-
-h2{
-font-size:20px;
-}
-
+.share button{
+flex:1;
+background:#444;
 }
