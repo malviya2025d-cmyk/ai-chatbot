@@ -2,7 +2,6 @@
 <html>
 <head>
 <title>AI Tools Hub</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -33,18 +32,19 @@ border-radius:6px;
 cursor:pointer;
 }
 
-/* CONTAINER */
-.container{
-padding:10px;
+/* ACTIVE BUTTON */
+header button.active{
+background:#00c3ff;
+color:#000;
 }
 
 /* TOOLS */
 .tool{
 display:none;
-background:#1a1a1a;
 padding:10px;
+background:#1a1a1a;
+margin:10px;
 border-radius:10px;
-margin-bottom:10px;
 }
 
 .tool.active{
@@ -53,8 +53,8 @@ display:block;
 
 /* CHAT */
 #chatbox{
-height:350px;
-overflow-y:auto;
+height:300px;
+overflow:auto;
 background:#000;
 padding:10px;
 border-radius:10px;
@@ -67,14 +67,8 @@ border-radius:10px;
 max-width:80%;
 }
 
-.user{
-background:#007bff;
-margin-left:auto;
-}
-
-.bot{
-background:#333;
-}
+.user{background:#007bff;margin-left:auto;}
+.bot{background:#333;}
 
 /* INPUT */
 input, textarea{
@@ -85,15 +79,17 @@ border:none;
 border-radius:6px;
 }
 
-button.send{
-background:#00c3ff;
-color:#000;
-margin-top:5px;
+/* IMAGE PREVIEW */
+#preview{
+max-width:100%;
+margin-top:10px;
+border-radius:10px;
 }
 
-/* MOBILE */
-@media (max-width:768px){
-.tool{display:block !important;}
+/* MOBILE FIX */
+@media(max-width:768px){
+.tool{display:none !important;}
+.tool.active{display:block !important;}
 }
 
 </style>
@@ -102,22 +98,20 @@ margin-top:5px;
 <body>
 
 <header>
-<button onclick="showTool('chat')">Chat</button>
-<button onclick="showTool('translate')">Translate</button>
-<button onclick="showTool('blog')">Blog</button>
-<button onclick="showTool('image')">Image</button>
-<button onclick="showTool('pdf')">PDF</button>
-<button onclick="showTool('seo')">🔥 SEO</button>
+<button onclick="showTool('chat',this)" class="active">Chat</button>
+<button onclick="showTool('translate',this)">Translate</button>
+<button onclick="showTool('blog',this)">Blog</button>
+<button onclick="showTool('image',this)">Image</button>
+<button onclick="showTool('pdf',this)">PDF</button>
+<button onclick="showTool('seo',this)">🔥 SEO</button>
 </header>
-
-<div class="container">
 
 <!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>Chat Bot</h2>
+<h2>Chat</h2>
 <div id="chatbox"></div>
 <input id="msg" placeholder="Type...">
-<button class="send" onclick="send()">Send</button>
+<button onclick="send()">Send</button>
 </div>
 
 <!-- TRANSLATE -->
@@ -130,102 +124,105 @@ margin-top:5px;
 
 <!-- BLOG -->
 <div id="blog" class="tool">
-<h2>Blog Generator</h2>
-<input id="blogTopic" placeholder="Enter topic">
+<h2>Blog</h2>
+<input id="blogTopic">
 <button onclick="blog()">Generate</button>
 <p id="blogResult"></p>
 </div>
 
-<!-- IMAGE -->
+<!-- IMAGE TOOL -->
 <div id="image" class="tool">
-<h2>Image Tool</h2>
-<input type="file">
-<p>Coming Soon: Effects 🔥</p>
+<h2>Image Editor 🔥</h2>
+
+<input type="file" onchange="loadImage(event)">
+
+<br><br>
+
+<button onclick="applyEffect('grayscale')">Grayscale</button>
+<button onclick="applyEffect('blur')">Blur</button>
+<button onclick="applyEffect('brightness')">Bright</button>
+
+<img id="preview">
 </div>
 
 <!-- PDF -->
 <div id="pdf" class="tool">
 <h2>PDF Tool</h2>
 <input type="file">
-<p>Coming Soon: PDF Scan / Convert</p>
+<p>Upload PDF (next update me full feature milega)</p>
 </div>
 
-<!-- SEO TOOL -->
+<!-- SEO -->
 <div id="seo" class="tool">
-<h2>🔥 YouTube / FB SEO Tool</h2>
+<h2>SEO Tool</h2>
 
-<input id="title" placeholder="Video/Post Title">
-<textarea id="desc" placeholder="Description"></textarea>
+<input id="title" placeholder="Title">
+<textarea id="desc"></textarea>
 
-<button onclick="seo()">Generate SEO</button>
-
+<button onclick="seo()">Generate</button>
 <p id="seoResult"></p>
-</div>
-
 </div>
 
 <script>
 
 /* TOOL SWITCH */
-function showTool(id){
+function showTool(id,btn){
 document.querySelectorAll(".tool").forEach(t=>t.classList.remove("active"));
 document.getElementById(id).classList.add("active");
+
+document.querySelectorAll("header button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
 }
 
 /* CHAT */
 async function send(){
-let msg = document.getElementById("msg").value;
+let msg=document.getElementById("msg").value;
+let box=document.getElementById("chatbox");
 
-let box = document.getElementById("chatbox");
+box.innerHTML+=`<div class="msg user">${msg}</div>`;
 
-box.innerHTML += `<div class="msg user">${msg}</div>`;
-
-document.getElementById("msg").value = "";
-
-let res = await fetch("/api/ai",{
+let res=await fetch("/api/ai",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({prompt:msg})
 });
 
-let data = await res.json();
+let data=await res.json();
 
-box.innerHTML += `<div class="msg bot">🤖 ${data.reply}</div>`;
-
-box.scrollTop = box.scrollHeight;
+box.innerHTML+=`<div class="msg bot">${data.reply}</div>`;
 }
 
 /* TRANSLATE */
 function translate(){
-let text = document.getElementById("transText").value;
-document.getElementById("transResult").innerText = "Translated: " + text;
+let t=document.getElementById("transText").value;
+document.getElementById("transResult").innerText="Translated: "+t;
 }
 
 /* BLOG */
 function blog(){
-let topic = document.getElementById("blogTopic").value;
-document.getElementById("blogResult").innerText = "Blog on: " + topic;
+let t=document.getElementById("blogTopic").value;
+document.getElementById("blogResult").innerText="Blog on "+t;
 }
 
-/* SEO TOOL */
+/* SEO */
 function seo(){
-let title = document.getElementById("title").value;
+let t=document.getElementById("title").value;
 
-let result = `
-🔥 Title:
-${title} | Best Tips 2026
+document.getElementById("seoResult").innerText=
+"Title: "+t+"\n\n#"+t.replaceAll(" ","")+" #viral #trending";
+}
 
-📄 Description:
-This video/post is about ${title}. Watch now and learn amazing tips.
+/* IMAGE TOOL */
+let img=document.getElementById("preview");
 
-🏷️ Hashtags:
-#${title.replaceAll(" ","")} #viral #trending #2026
+function loadImage(e){
+img.src=URL.createObjectURL(e.target.files[0]);
+}
 
-🔑 Tags:
-${title}, viral, trending, tips, seo
-`;
-
-document.getElementById("seoResult").innerText = result;
+function applyEffect(type){
+if(type==="grayscale") img.style.filter="grayscale(100%)";
+if(type==="blur") img.style.filter="blur(5px)";
+if(type==="brightness") img.style.filter="brightness(150%)";
 }
 
 </script>
