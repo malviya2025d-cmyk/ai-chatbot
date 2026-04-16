@@ -1,251 +1,231 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>AI Tools Hub Final</title>
+<title>AI Tools Hub</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-
 <style>
-body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
 
-header{display:flex;gap:5px;padding:10px;background:#111}
-header button{flex:1;padding:10px;background:#00c853;border:none;border-radius:6px;color:#000;font-weight:bold}
-
-.container{padding:10px;width:100%;box-sizing:border-box}
-.tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px;overflow-x:auto}
-.active{display:block}
-
-input,button,select{
-width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none;font-size:16px
+/* BODY */
+body{
+margin:0;
+font-family:Arial;
+background:#0f0f0f;
+color:#fff;
 }
 
-/* MOBILE FIX */
-img, iframe, embed{max-width:100%;height:auto}
+/* HEADER */
+header{
+display:flex;
+flex-wrap:wrap;
+padding:10px;
+background:#111;
+}
+
+header button{
+margin:3px;
+padding:10px;
+border:none;
+background:#222;
+color:#fff;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* CONTAINER */
+.container{
+padding:10px;
+}
+
+/* TOOLS */
+.tool{
+display:none;
+background:#1a1a1a;
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.tool.active{
+display:block;
+}
 
 /* CHAT */
 #chatbox{
-height:400px;overflow-y:auto;background:#0f0f0f;padding:10px;border-radius:10px;
-border:2px solid transparent;
-background-image:linear-gradient(#0f0f0f,#0f0f0f),
-linear-gradient(45deg,#00ffcc,#00c853,#00ffcc);
-background-origin:border-box;
-background-clip:padding-box,border-box;
-animation:glow 3s linear infinite;
+height:350px;
+overflow-y:auto;
+background:#000;
+padding:10px;
+border-radius:10px;
 }
 
-@keyframes glow{
-0%{filter:hue-rotate(0deg)}
-100%{filter:hue-rotate(360deg)}
+.msg{
+padding:10px;
+margin:5px;
+border-radius:10px;
+max-width:80%;
 }
 
-.msg{padding:10px;margin:5px 0;border-radius:10px;max-width:80%}
-.user{background:#00c853;color:#000;margin-left:auto}
-.bot{background:#1e1e1e;line-height:1.6}
-
-/* FORMAT */
-.bot h1,.bot h2{color:#00ffcc}
-.bot ul{padding-left:20px}
-.bot code{background:#000;padding:4px;border-radius:5px;color:#00ffcc}
-
-/* TYPING */
-.typing{display:flex;gap:5px}
-.typing span{
-width:8px;height:8px;background:#00ffcc;border-radius:50%;
-animation:blink 1.5s infinite;
-}
-.typing span:nth-child(2){animation-delay:0.2s}
-.typing span:nth-child(3){animation-delay:0.4s}
-
-@keyframes blink{
-0%,100%{opacity:0.2}
-50%{opacity:1}
+.user{
+background:#007bff;
+margin-left:auto;
 }
 
-#loadingPopup{
-position:fixed;top:50%;left:50%;
-transform:translate(-50%,-50%);
-background:#111;padding:20px;border-radius:10px;
-display:none;color:#00ffcc;
+.bot{
+background:#333;
 }
+
+/* INPUT */
+input, textarea{
+width:100%;
+padding:10px;
+margin-top:5px;
+border:none;
+border-radius:6px;
+}
+
+button.send{
+background:#00c3ff;
+color:#000;
+margin-top:5px;
+}
+
+/* MOBILE */
+@media (max-width:768px){
+.tool{display:block !important;}
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<button onclick="show('chat')">Chat</button>
-<button onclick="show('trans')">Translate</button>
+<button onclick="showTool('chat')">Chat</button>
+<button onclick="showTool('translate')">Translate</button>
+<button onclick="showTool('blog')">Blog</button>
+<button onclick="showTool('image')">Image</button>
+<button onclick="showTool('pdf')">PDF</button>
+<button onclick="showTool('seo')">🔥 SEO</button>
 </header>
-
-<div id="loadingPopup">🔍 AI is thinking...</div>
 
 <div class="container">
 
 <!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>AI Chat</h2>
-
-<select id="lang">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-</select>
-
+<h2>Chat Bot</h2>
 <div id="chatbox"></div>
-
-<input id="input" placeholder="Type message...">
-
-<button onclick="sendChat()">Send</button>
-<button onclick="startVoice()">🎤 Speak</button>
-<button onclick="stopVoice()">⛔ Stop</button>
-<button onclick="toggleVoice()">🔊 Voice ON/OFF</button>
+<input id="msg" placeholder="Type...">
+<button class="send" onclick="send()">Send</button>
 </div>
 
 <!-- TRANSLATE -->
-<div id="trans" class="tool">
+<div id="translate" class="tool">
 <h2>Translate</h2>
+<textarea id="transText"></textarea>
+<button onclick="translate()">Translate</button>
+<p id="transResult"></p>
+</div>
 
-<input id="text" placeholder="Type text">
+<!-- BLOG -->
+<div id="blog" class="tool">
+<h2>Blog Generator</h2>
+<input id="blogTopic" placeholder="Enter topic">
+<button onclick="blog()">Generate</button>
+<p id="blogResult"></p>
+</div>
 
-<select id="lang2">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="mr">Marathi</option>
-<option value="pa">Punjabi</option>
-<option value="bn">Bengali</option>
-</select>
+<!-- IMAGE -->
+<div id="image" class="tool">
+<h2>Image Tool</h2>
+<input type="file">
+<p>Coming Soon: Effects 🔥</p>
+</div>
 
-<button onclick="translateText()">Translate</button>
+<!-- PDF -->
+<div id="pdf" class="tool">
+<h2>PDF Tool</h2>
+<input type="file">
+<p>Coming Soon: PDF Scan / Convert</p>
+</div>
 
-<hr>
+<!-- SEO TOOL -->
+<div id="seo" class="tool">
+<h2>🔥 YouTube / FB SEO Tool</h2>
 
-<input type="file" accept="image/*" capture="environment" onchange="readImage(event)">
-<p id="ocrText"></p>
-<div id="out"></div>
+<input id="title" placeholder="Video/Post Title">
+<textarea id="desc" placeholder="Description"></textarea>
+
+<button onclick="seo()">Generate SEO</button>
+
+<p id="seoResult"></p>
 </div>
 
 </div>
 
 <script>
 
-/* SWITCH */
-function show(id){
-document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
-
-/* FORMAT */
-function formatReply(text){
-return text.replace(/\n/g,"<br>");
-}
-
-/* MEMORY */
-let history=JSON.parse(localStorage.getItem("chatHistory")||"[]");
-
-function loadHistory(){
-history.forEach(m=>{
-chatbox.innerHTML+=`<div class="msg ${m.type}">${formatReply(m.text)}</div>`;
-});
-}
-loadHistory();
-
-/* VOICE CONTROL */
-let speechOn=true;
-
-function toggleVoice(){
-speechOn=!speechOn;
-alert("Voice: "+(speechOn?"ON":"OFF"));
-}
-
-function cleanText(t){
-return t.replace(/[#*`>-]/g,"").replace(/\s+/g," ").trim();
-}
-
-function speak(text){
-if(!speechOn) return;
-speechSynthesis.cancel(); // STOP OLD
-let s=new SpeechSynthesisUtterance(cleanText(text));
-speechSynthesis.speak(s);
+/* TOOL SWITCH */
+function showTool(id){
+document.querySelectorAll(".tool").forEach(t=>t.classList.remove("active"));
+document.getElementById(id).classList.add("active");
 }
 
 /* CHAT */
-async function sendChat(){
-let t=input.value.trim();
-if(!t) return;
+async function send(){
+let msg = document.getElementById("msg").value;
 
-chatbox.innerHTML+=`<div class="msg user">${t}</div>`;
-input.value="";
-loadingPopup.style.display="block";
+let box = document.getElementById("chatbox");
 
-let id="t"+Date.now();
-chatbox.innerHTML+=`<div id="${id}" class="msg bot"><div class="typing"><span></span><span></span><span></span></div></div>`;
+box.innerHTML += `<div class="msg user">${msg}</div>`;
 
-let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:t,lang:lang.value})});
+document.getElementById("msg").value = "";
 
-let d=await res.json();
-
-document.getElementById(id).remove();
-loadingPopup.style.display="none";
-
-chatbox.innerHTML+=`<div class="msg bot">${formatReply(d.reply)}</div>`;
-
-history.push({type:"user",text:t});
-history.push({type:"bot",text:d.reply});
-localStorage.setItem("chatHistory",JSON.stringify(history));
-
-speak(d.reply);
-}
-
-/* ENTER FIX */
-input.addEventListener("keydown",e=>{
-if(e.key==="Enter"&&!e.shiftKey){
-e.preventDefault();sendChat();
-}
+let res = await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:msg})
 });
 
-text.addEventListener("keydown",e=>{
-if(e.key==="Enter"){
-e.preventDefault();translateText();
-}
-});
+let data = await res.json();
 
-/* VOICE INPUT */
-let recognition;
-function startVoice(){
-recognition=new webkitSpeechRecognition();
-recognition.onresult=e=>{
-input.value=e.results[0][0].transcript;
-sendChat();
-};
-recognition.start();
+box.innerHTML += `<div class="msg bot">🤖 ${data.reply}</div>`;
+
+box.scrollTop = box.scrollHeight;
 }
-function stopVoice(){if(recognition)recognition.stop();}
 
 /* TRANSLATE */
-async function translateText(){
-let t=text.value;
-let l=lang2.value;
-
-let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:`Translate to ${l}: ${t}`})});
-
-let d=await res.json();
-out.innerHTML=d.reply;
+function translate(){
+let text = document.getElementById("transText").value;
+document.getElementById("transResult").innerText = "Translated: " + text;
 }
 
-/* OCR */
-async function readImage(e){
-let f=e.target.files[0];
-let r=await Tesseract.recognize(f,"eng+hin");
-ocrText.innerText=r.data.text;
+/* BLOG */
+function blog(){
+let topic = document.getElementById("blogTopic").value;
+document.getElementById("blogResult").innerText = "Blog on: " + topic;
+}
 
-let res=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:`Translate: ${r.data.text}`})});
+/* SEO TOOL */
+function seo(){
+let title = document.getElementById("title").value;
 
-let d=await res.json();
-out.innerHTML=d.reply;
+let result = `
+🔥 Title:
+${title} | Best Tips 2026
+
+📄 Description:
+This video/post is about ${title}. Watch now and learn amazing tips.
+
+🏷️ Hashtags:
+#${title.replaceAll(" ","")} #viral #trending #2026
+
+🔑 Tags:
+${title}, viral, trending, tips, seo
+`;
+
+document.getElementById("seoResult").innerText = result;
 }
 
 </script>
