@@ -8,10 +8,18 @@ try {
 
 const { prompt } = req.body;
 
+if (!prompt) {
+return res.status(400).json({ reply: "No prompt" });
+}
+
+/* 🔥 DEBUG */
+console.log("PROMPT:", prompt);
+console.log("API KEY:", process.env.GROQ_API_KEY ? "OK" : "MISSING");
+
 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
 method: "POST",
 headers: {
-"Authorization": "Bearer " + process.env.GROQ_API_KEY,
+"Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
 "Content-Type": "application/json"
 },
 body: JSON.stringify({
@@ -24,13 +32,28 @@ messages: [
 
 const data = await response.json();
 
-const reply = data?.choices?.[0]?.message?.content || "No reply";
+/* 🔥 FULL DEBUG */
+console.log("FULL API RESPONSE:", JSON.stringify(data));
 
-res.status(200).json({ reply });
+const reply = data?.choices?.[0]?.message?.content;
+
+if (!reply) {
+return res.status(500).json({
+reply: "❌ No reply from AI",
+debug: data
+});
+}
+
+return res.status(200).json({ reply });
 
 } catch (error) {
 
-res.status(500).json({ reply: "API ERROR" });
+console.error("ERROR:", error);
+
+return res.status(500).json({
+reply: "❌ Server error",
+error: error.message
+});
 
 }
 }
