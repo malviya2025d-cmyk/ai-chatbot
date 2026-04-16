@@ -6,7 +6,7 @@
 
 <style>
 
-/* BODY */
+/* 🌙 BODY */
 body{
 margin:0;
 font-family:Arial;
@@ -14,15 +14,18 @@ background:#0f0f0f;
 color:#fff;
 }
 
-/* HEADER */
+/* 🔝 HEADER */
 header{
 display:flex;
 flex-wrap:wrap;
+justify-content:center;
 padding:10px;
 background:#111;
 }
 
 header button{
+flex:1;
+min-width:80px;
 margin:3px;
 padding:10px;
 border:none;
@@ -32,13 +35,12 @@ border-radius:6px;
 cursor:pointer;
 }
 
-/* ACTIVE BUTTON */
 header button.active{
 background:#00c3ff;
 color:#000;
 }
 
-/* TOOLS */
+/* 📦 TOOL BOX */
 .tool{
 display:none;
 padding:10px;
@@ -51,7 +53,7 @@ border-radius:10px;
 display:block;
 }
 
-/* CHAT */
+/* 💬 CHAT */
 #chatbox{
 height:300px;
 overflow:auto;
@@ -70,26 +72,38 @@ max-width:80%;
 .user{background:#007bff;margin-left:auto;}
 .bot{background:#333;}
 
-/* INPUT */
+/* 🧾 INPUT */
 input, textarea{
 width:100%;
 padding:10px;
 margin-top:5px;
 border:none;
 border-radius:6px;
+font-size:16px;
 }
 
-/* IMAGE PREVIEW */
+button{
+margin-top:5px;
+}
+
+/* 📸 IMAGE */
 #preview{
 max-width:100%;
 margin-top:10px;
 border-radius:10px;
 }
 
-/* MOBILE FIX */
-@media(max-width:768px){
-.tool{display:none !important;}
-.tool.active{display:block !important;}
+/* 🔗 SHARE BUTTONS */
+.share{
+display:flex;
+gap:5px;
+flex-wrap:wrap;
+margin:10px;
+}
+
+.share button{
+flex:1;
+background:#444;
 }
 
 </style>
@@ -102,19 +116,26 @@ border-radius:10px;
 <button onclick="showTool('translate',this)">Translate</button>
 <button onclick="showTool('blog',this)">Blog</button>
 <button onclick="showTool('image',this)">Image</button>
-<button onclick="showTool('pdf',this)">PDF</button>
-<button onclick="showTool('seo',this)">🔥 SEO</button>
+<button onclick="showTool('seo',this)">SEO</button>
 </header>
 
-<!-- CHAT -->
+<!-- 🔗 SHARE -->
+<div class="share">
+<button onclick="shareWhatsApp()">WhatsApp</button>
+<button onclick="shareFacebook()">Facebook</button>
+<button onclick="shareTwitter()">Twitter</button>
+<button onclick="copyLink()">Copy Link</button>
+</div>
+
+<!-- 💬 CHAT -->
 <div id="chat" class="tool active">
 <h2>Chat</h2>
 <div id="chatbox"></div>
-<input id="msg" placeholder="Type...">
+<input id="msg" placeholder="Type message...">
 <button onclick="send()">Send</button>
 </div>
 
-<!-- TRANSLATE -->
+<!-- 🌐 TRANSLATE -->
 <div id="translate" class="tool">
 <h2>Translate</h2>
 <textarea id="transText"></textarea>
@@ -122,50 +143,37 @@ border-radius:10px;
 <p id="transResult"></p>
 </div>
 
-<!-- BLOG -->
+<!-- ✍️ BLOG -->
 <div id="blog" class="tool">
-<h2>Blog</h2>
-<input id="blogTopic">
+<h2>Blog Generator</h2>
+<input id="blogTopic" placeholder="Enter topic">
 <button onclick="blog()">Generate</button>
 <p id="blogResult"></p>
 </div>
 
-<!-- IMAGE TOOL -->
+<!-- 🖼 IMAGE -->
 <div id="image" class="tool">
-<h2>Image Editor 🔥</h2>
-
+<h2>Image Editor</h2>
 <input type="file" onchange="loadImage(event)">
-
 <br><br>
-
 <button onclick="applyEffect('grayscale')">Grayscale</button>
 <button onclick="applyEffect('blur')">Blur</button>
 <button onclick="applyEffect('brightness')">Bright</button>
-
 <img id="preview">
 </div>
 
-<!-- PDF -->
-<div id="pdf" class="tool">
-<h2>PDF Tool</h2>
-<input type="file">
-<p>Upload PDF (next update me full feature milega)</p>
-</div>
-
-<!-- SEO -->
+<!-- 🔥 SEO -->
 <div id="seo" class="tool">
 <h2>SEO Tool</h2>
-
-<input id="title" placeholder="Title">
-<textarea id="desc"></textarea>
-
+<input id="title" placeholder="Enter Title">
+<textarea id="desc" placeholder="Enter Description"></textarea>
 <button onclick="seo()">Generate</button>
 <p id="seoResult"></p>
 </div>
 
 <script>
 
-/* TOOL SWITCH */
+/* 🔄 TOOL SWITCH */
 function showTool(id,btn){
 document.querySelectorAll(".tool").forEach(t=>t.classList.remove("active"));
 document.getElementById(id).classList.add("active");
@@ -174,7 +182,14 @@ document.querySelectorAll("header button").forEach(b=>b.classList.remove("active
 btn.classList.add("active");
 }
 
-/* CHAT */
+/* 💬 ENTER KEY */
+document.getElementById("msg").addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+send();
+}
+});
+
+/* 🤖 CHAT */
 async function send(){
 let msg=document.getElementById("msg").value;
 let box=document.getElementById("chatbox");
@@ -189,30 +204,50 @@ body:JSON.stringify({prompt:msg})
 
 let data=await res.json();
 
-box.innerHTML+=`<div class="msg bot">${data.reply}</div>`;
+box.innerHTML+=`<div class="msg bot">😊 ${data.reply}</div>`;
 }
 
-/* TRANSLATE */
-function translate(){
+/* 🌐 TRANSLATE */
+async function translate(){
 let t=document.getElementById("transText").value;
-document.getElementById("transResult").innerText="Translated: "+t;
+
+let res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:`Translate: ${t}`})
+});
+
+let data=await res.json();
+
+document.getElementById("transResult").innerText=data.reply;
 }
 
-/* BLOG */
-function blog(){
+/* ✍️ BLOG */
+async function blog(){
 let t=document.getElementById("blogTopic").value;
-document.getElementById("blogResult").innerText="Blog on "+t;
+
+let res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:`Write blog on: ${t}`})
+});
+
+let data=await res.json();
+
+document.getElementById("blogResult").innerText=data.reply;
 }
 
-/* SEO */
+/* 🔥 SEO */
 function seo(){
 let t=document.getElementById("title").value;
 
 document.getElementById("seoResult").innerText=
-"Title: "+t+"\n\n#"+t.replaceAll(" ","")+" #viral #trending";
+`Title: ${t}
+
+#${t.replaceAll(" ","")} #viral #trending`;
 }
 
-/* IMAGE TOOL */
+/* 🖼 IMAGE */
 let img=document.getElementById("preview");
 
 function loadImage(e){
@@ -223,6 +258,24 @@ function applyEffect(type){
 if(type==="grayscale") img.style.filter="grayscale(100%)";
 if(type==="blur") img.style.filter="blur(5px)";
 if(type==="brightness") img.style.filter="brightness(150%)";
+}
+
+/* 🔗 SHARE */
+function shareWhatsApp(){
+window.open(`https://wa.me/?text=${location.href}`);
+}
+
+function shareFacebook(){
+window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
+}
+
+function shareTwitter(){
+window.open(`https://twitter.com/intent/tweet?url=${location.href}`);
+}
+
+function copyLink(){
+navigator.clipboard.writeText(location.href);
+alert("Link copied!");
 }
 
 </script>
