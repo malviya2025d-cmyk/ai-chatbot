@@ -1,139 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
-
-<title>AI Tools Hub Pro</title>
-
+<title>AI Tools Hub Ultimate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-E48LS72B74"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-E48LS72B74');
-</script>
-
-<!-- AdSense -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264" crossorigin="anonymous"></script>
-
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
 <style>
-body{
-margin:0;
-font-family: Arial, "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-background:#0f0f0f;
-color:#fff;
-}
+body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
 
-header{
-display:flex;
-flex-wrap:wrap;
-gap:5px;
-padding:10px;
-background:#111;
-}
+header{display:flex;gap:5px;padding:10px;background:#111}
+header button{flex:1;padding:10px;background:#00c853;border:none;border-radius:6px;color:#000;font-weight:bold;cursor:pointer}
 
-header button{
-flex:1;
-padding:10px;
-background:#00c853;
-border:none;
-border-radius:6px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.container{padding:10px;}
-
-.tool{
-display:none;
-background:#1e1e1e;
-padding:15px;
-border-radius:10px;
-}
-
-.active{display:block;}
+.container{padding:10px}
+.tool{display:none;background:#1e1e1e;padding:15px;border-radius:10px}
+.active{display:block}
 
 input,textarea,select{
-width:100%;
-padding:10px;
-margin-top:10px;
-border:none;
-border-radius:6px;
+width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none
 }
 
 #chatbox{
-height:420px;
-overflow-y:auto;
-background:#0f0f0f;
-padding:15px;
-display:flex;
-flex-direction:column;
-gap:12px;
-border-radius:10px;
+height:400px;overflow-y:auto;background:#0f0f0f;padding:10px;border-radius:10px;
+border:2px solid transparent;
+background-image:linear-gradient(#0f0f0f,#0f0f0f),
+linear-gradient(45deg,#00ffcc,#00c853,#00ffcc);
+background-origin:border-box;
+background-clip:padding-box,border-box;
+animation:glow 3s linear infinite;
+}
+
+@keyframes glow{
+0%{filter:hue-rotate(0deg)}
+100%{filter:hue-rotate(360deg)}
 }
 
 .msg{
-padding:12px 16px;
-border-radius:12px;
-max-width:80%;
-line-height:1.5;
-font-size:15px;
-animation:fadeIn 0.3s ease;
-position:relative;
+padding:10px;margin:5px 0;border-radius:10px;max-width:80%;
+animation:fadeUp 0.3s ease
 }
 
-.user{
-background:#00c853;
-color:#000;
-align-self:flex-end;
-border-bottom-right-radius:4px;
+.user{background:#00c853;color:#000;margin-left:auto}
+.bot{background:#333}
+
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(10px)}
+to{opacity:1;transform:translateY(0)}
 }
 
-.bot{
-background:#1e1e1e;
-align-self:flex-start;
-border-bottom-left-radius:4px;
+#loadingPopup{
+position:fixed;top:50%;left:50%;
+transform:translate(-50%,-50%);
+background:#111;padding:20px 30px;border-radius:10px;
+display:none;color:#00ffcc;font-weight:bold;
+box-shadow:0 0 20px #00ffcc;
+animation:pulse 1s infinite;
 }
 
-.copyBtn{
-position:absolute;
-right:6px;
-bottom:6px;
-font-size:12px;
-cursor:pointer;
-color:#aaa;
+@keyframes pulse{
+0%{opacity:0.5}
+50%{opacity:1}
+100%{opacity:0.5}
 }
 
-@keyframes fadeIn{
-from{opacity:0; transform:translateY(10px);}
-to{opacity:1; transform:translateY(0);}
+.typing{display:flex;gap:5px;padding:10px}
+.typing span{
+width:8px;height:8px;background:#00ffcc;border-radius:50%;
+animation:blink 1.5s infinite;
+}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+
+@keyframes blink{
+0%,100%{opacity:0.2}
+50%{opacity:1}
 }
 
-canvas{
-width:100%;
-margin-top:10px;
-border-radius:10px;
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 10px #00ffcc;
 }
 </style>
-
 </head>
 
 <body>
 
 <header>
 <button onclick="show('chat')">Chat</button>
-<button onclick="show('blog')">Blog</button>
 <button onclick="show('trans')">Translate</button>
-<button onclick="show('pdf')">PDF</button>
-<button onclick="show('img')">Image</button>
 </header>
+
+<div id="loadingPopup">🔍 AI is thinking...</div>
 
 <div class="container">
 
@@ -145,147 +103,148 @@ border-radius:10px;
 <option value="auto">Auto</option>
 <option value="en">English</option>
 <option value="hi">Hindi</option>
-<option value="es">Spanish</option>
-<option value="fr">French</option>
-<option value="de">German</option>
-<option value="ru">Russian</option>
-<option value="zh">Chinese</option>
-<option value="ar">Arabic</option>
 </select>
 
 <div id="chatbox"></div>
 
-<input id="input" placeholder="Type message..." />
-<button onclick="sendChat()">Send</button>
-</div>
+<input id="input" placeholder="Type message...">
 
-<!-- BLOG -->
-<div id="blog" class="tool">
-<h2>Blog Generator</h2>
-<input id="blogInput" placeholder="Topic...">
-<button onclick="generateBlog()">Generate</button>
-<div id="blogOut"></div>
+<button onclick="sendChat()">Send</button>
+<button onclick="startVoice()">🎤 Speak</button>
+<button onclick="stopVoice()">⛔ Stop</button>
+
 </div>
 
 <!-- TRANSLATE -->
 <div id="trans" class="tool">
 <h2>Translate</h2>
-<input id="text">
+
+<input id="text" placeholder="Type text">
+
 <select id="lang2">
 <option value="en">English</option>
 <option value="hi">Hindi</option>
+<option value="mr">Marathi</option>
+<option value="pa">Punjabi</option>
+<option value="or">Odia</option>
+<option value="bn">Bengali</option>
+<option value="gu">Gujarati</option>
+<option value="ta">Tamil</option>
+<option value="te">Telugu</option>
+<option value="kn">Kannada</option>
+<option value="ml">Malayalam</option>
+<option value="ur">Urdu</option>
 <option value="es">Spanish</option>
 <option value="fr">French</option>
+<option value="de">German</option>
+<option value="ru">Russian</option>
+<option value="zh">Chinese</option>
+<option value="ja">Japanese</option>
+<option value="ko">Korean</option>
+<option value="ar">Arabic</option>
+<option value="pt">Portuguese</option>
 </select>
+
 <button onclick="translateText()">Translate</button>
+
+<hr>
+
+<h3>📸 Image / Camera Translate</h3>
+<input type="file" accept="image/*" capture="camera" onchange="readImage(event)">
+<p id="ocrText"></p>
+
 <div id="out"></div>
-</div>
-
-<!-- PDF -->
-<div id="pdf" class="tool">
-<h2>PDF Tool</h2>
-<input type="file" accept="image/*" onchange="addImagePDF(event)">
-<textarea id="pdfText"></textarea>
-<button onclick="makePDF()">Download PDF</button>
-</div>
-
-<!-- IMAGE -->
-<div id="img" class="tool">
-<h2>Image Tool</h2>
-<input type="file" accept="image/*" onchange="loadImg(event)">
-<button onclick="gray()">Gray</button>
-<button onclick="invert()">Invert</button>
-<button onclick="rotate()">Rotate</button>
-<button onclick="downloadImg()">Download</button>
-<canvas id="c"></canvas>
 </div>
 
 </div>
 
 <script>
 
-/* SWITCH */
+/* TOOL SWITCH */
 function show(id){
 document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 }
 
-/* CHAT */
-let memory=[];
-const input=document.getElementById("input");
-const chatbox=document.getElementById("chatbox");
+/* MEMORY LOAD */
+let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
 
-window.onload=()=>{
-let old=localStorage.getItem("chat");
-if(old) chatbox.innerHTML=old;
-};
-
-input.addEventListener("keypress",e=>{
-if(e.key==="Enter") sendChat();
+function loadHistory(){
+history.forEach(msg=>{
+document.getElementById("chatbox").innerHTML+=`<div class="msg ${msg.type}">${msg.text}</div>`;
 });
-
-function saveChat(){
-localStorage.setItem("chat",chatbox.innerHTML);
 }
+loadHistory();
 
+/* CHAT */
 async function sendChat(){
 
-let text=input.value.trim();
+let text=document.getElementById("input").value;
 if(!text) return;
 
-memory.push(text);
-if(memory.length>5) memory.shift();
+document.getElementById("chatbox").innerHTML+=`<div class="msg user">${text}</div>`;
+history.push({type:"user",text});
+localStorage.setItem("chatHistory",JSON.stringify(history));
 
-chatbox.innerHTML+=`<div class="msg user">${text}</div>`;
-input.value="";
+document.getElementById("input").value="";
 
-let typing=document.createElement("div");
-typing.className="msg bot";
-typing.innerHTML="Typing...";
-chatbox.appendChild(typing);
+document.getElementById("loadingPopup").style.display="block";
 
-let res=await fetch("/api/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-prompt: memory.join("\n") + "\nUser: " + text,
-lang: document.getElementById("lang").value
-})
-});
-
-let data=await res.json();
-
-typing.remove();
-
-let msg=document.createElement("div");
-msg.className="msg bot";
-msg.innerHTML=`${data.reply} <span class="copyBtn" onclick="copyText(this)">📋</span>`;
-
-chatbox.appendChild(msg);
-
-saveChat();
-chatbox.scrollTop=chatbox.scrollHeight;
-}
-
-function copyText(el){
-let text=el.parentElement.innerText.replace("📋","");
-navigator.clipboard.writeText(text);
-}
-
-/* BLOG */
-async function generateBlog(){
-let t=document.getElementById("blogInput").value;
+let typingId="typing"+Date.now();
+document.getElementById("chatbox").innerHTML+=`
+<div id="${typingId}" class="msg bot">
+<div class="typing"><span></span><span></span><span></span></div>
+</div>`;
 
 let res=await fetch("/api/ai",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-prompt:`Write SEO blog in ${document.getElementById("lang").value}: `+t
+prompt:text,
+lang:document.getElementById("lang").value
 })
 });
 
 let d=await res.json();
-document.getElementById("blogOut").innerHTML=d.reply;
+
+document.getElementById(typingId).remove();
+document.getElementById("loadingPopup").style.display="none";
+
+document.getElementById("chatbox").innerHTML+=`<div class="msg bot">${d.reply}</div>`;
+history.push({type:"bot",text:d.reply});
+localStorage.setItem("chatHistory",JSON.stringify(history));
+
+speak(d.reply);
+}
+
+/* VOICE INPUT */
+let recognition;
+
+function startVoice(){
+if(!('webkitSpeechRecognition' in window)){
+alert("Voice not supported");
+return;
+}
+
+recognition = new webkitSpeechRecognition();
+recognition.lang = "en-IN";
+recognition.onresult = function(e){
+let t=e.results[0][0].transcript;
+document.getElementById("input").value=t;
+sendChat();
+};
+recognition.start();
+}
+
+function stopVoice(){
+if(recognition) recognition.stop();
+}
+
+/* VOICE OUTPUT */
+function speak(text){
+let s=new SpeechSynthesisUtterance(text);
+s.lang="en-US";
+window.speechSynthesis.speak(s);
 }
 
 /* TRANSLATE */
@@ -305,66 +264,30 @@ let d=await res.json();
 document.getElementById("out").innerHTML=d.reply;
 }
 
-/* PDF */
-let pdfImg=null;
-function addImagePDF(e){
-let r=new FileReader();
-r.onload=()=>pdfImg=r.result;
-r.readAsDataURL(e.target.files[0]);
-}
+/* OCR */
+async function readImage(e){
+const file=e.target.files[0];
+if(!file) return;
 
-function makePDF(){
-const { jsPDF }=window.jspdf;
-let doc=new jsPDF();
-doc.text(document.getElementById("pdfText").value,10,10);
-if(pdfImg) doc.addImage(pdfImg,"JPEG",10,30,180,100);
-doc.save("file.pdf");
-}
+document.getElementById("ocrText").innerText="Reading image...";
 
-/* IMAGE */
-let c=document.getElementById("c");
-let ctx=c.getContext("2d");
-let img=new Image();
+const result=await Tesseract.recognize(file,"eng+hin");
+const text=result.data.text;
 
-function loadImg(e){
-let r=new FileReader();
-r.onload=()=>img.src=r.result;
-img.onload=()=>{c.width=300;c.height=300;ctx.drawImage(img,0,0,300,300);}
-r.readAsDataURL(e.target.files[0]);
-}
+document.getElementById("ocrText").innerText=text;
 
-function gray(){
-let d=ctx.getImageData(0,0,c.width,c.height);
-let a=d.data;
-for(let i=0;i<a.length;i+=4){
-let g=(a[i]+a[i+1]+a[i+2])/3;
-a[i]=a[i+1]=a[i+2]=g;
-}
-ctx.putImageData(d,0,0);
-}
+let lang=document.getElementById("lang2").value;
 
-function invert(){
-let d=ctx.getImageData(0,0,c.width,c.height);
-let a=d.data;
-for(let i=0;i<a.length;i+=4){
-a[i]=255-a[i];
-a[i+1]=255-a[i+1];
-a[i+2]=255-a[i+2];
-}
-ctx.putImageData(d,0,0);
-}
+let res=await fetch("/api/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+prompt:`Translate to ${lang}: ${text}`
+})
+});
 
-function rotate(){
-ctx.translate(c.width/2,c.height/2);
-ctx.rotate(Math.PI/2);
-ctx.drawImage(img,-150,-150,300,300);
-}
-
-function downloadImg(){
-let a=document.createElement("a");
-a.href=c.toDataURL();
-a.download="image.png";
-a.click();
+let d=await res.json();
+document.getElementById("out").innerHTML=d.reply;
 }
 
 </script>
