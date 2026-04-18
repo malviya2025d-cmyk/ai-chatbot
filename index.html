@@ -1,108 +1,189 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Tools Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* TOOL SWITCH */
-function showTool(id,btn){
+<!-- ✅ AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
+crossorigin="anonymous"></script>
+
+<style>
+body{
+margin:0;
+font-family:sans-serif;
+background:#0f2027;
+color:#fff;
+}
+
+header{
+display:flex;
+background:#000;
+}
+
+header button{
+flex:1;
+padding:10px;
+border:none;
+background:#111;
+color:#fff;
+cursor:pointer;
+}
+
+header button.active{
+background:#00c3ff;
+color:#000;
+}
+
+.tool{
+display:none;
+padding:10px;
+}
+
+.tool.active{
+display:block;
+}
+
+#chatbox{
+height:300px;
+overflow:auto;
+background:#111;
+padding:10px;
+border-radius:10px;
+}
+
+.msg{
+margin:5px;
+padding:8px;
+border-radius:8px;
+}
+
+.user{background:#0084ff;text-align:right}
+.bot{background:#333}
+
+input{
+width:100%;
+padding:10px;
+margin-top:5px;
+border:none;
+border-radius:8px;
+}
+
+button{
+margin-top:5px;
+padding:10px;
+border:none;
+border-radius:8px;
+background:#00c3ff;
+color:#000;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<button onclick="showTool('chat',this)" class="active">Chat 🤖</button>
+</header>
+
+<!-- 🔥 AD -->
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-8334252996051264"
+data-ad-slot="1234567890"
+data-ad-format="auto"
+data-full-width-responsive="true"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<!-- CHAT -->
+<div id="chat" class="tool active">
+<h2>AI Chat 🤖</h2>
+
+<div id="chatbox"></div>
+
+<input id="msg" placeholder="Type message...">
+<button onclick="send()">Send</button>
+<button onclick="startVoice()">🎤 Speak</button>
+<button onclick="clearChat()">🧹 Clear</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+const msg = document.getElementById("msg");
+const chatbox = document.getElementById("chatbox");
+
+/* TOOL */
+window.showTool = function(id,btn){
 document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 document.querySelectorAll('header button').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 }
 
-/* DOM LOAD FIX */
-window.addEventListener("DOMContentLoaded",()=>{
-
-const msgInput = document.getElementById("msg");
-const chatbox = document.getElementById("chatbox");
-
 /* ENTER KEY */
-msgInput.addEventListener("keydown",function(e){
+msg.addEventListener("keydown",(e)=>{
 if(e.key==="Enter"){
-e.preventDefault();
 send();
 }
 });
 
-/* LOAD OLD CHAT */
-let old = localStorage.getItem("chat");
-if(old) chatbox.innerHTML = old;
+/* SEND */
+window.send = async function(){
 
-});
+let text = msg.value.trim();
+if(!text) return;
 
-/* CHAT SEND */
-async function send(){
+chatbox.innerHTML += `<div class="msg user">🧑 ${text}</div>`;
+msg.value="";
 
-const msgInput = document.getElementById("msg");
-const chatbox = document.getElementById("chatbox");
-
-let msg = msgInput.value.trim();
-if(!msg) return;
-
-chatbox.innerHTML += `<div class="msg user">🧑 ${msg}</div>`;
-msgInput.value = "";
-
-chatbox.innerHTML += `<div class="msg bot">🤖 Typing...</div>`;
+chatbox.innerHTML += `<div class="msg bot">🤖 Thinking...</div>`;
 
 try{
 
 let res = await fetch("/api/ai",{
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({message:msg})
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:text})
 });
 
 let data = await res.json();
 
-/* DEBUG */
-console.log(data);
-
-/* SAFE RESPONSE */
-let reply = data?.choices?.[0]?.message?.content;
-
-if(!reply){
-chatbox.lastChild.innerHTML="❌ No reply (check API)";
-return;
-}
+let reply = data?.choices?.[0]?.message?.content || "No reply";
 
 chatbox.lastChild.innerHTML = "🤖 " + reply;
 
-/* SAVE CHAT */
-localStorage.setItem("chat",chatbox.innerHTML);
-
-/* VOICE */
 speechSynthesis.cancel();
 speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
 
 }catch(err){
-chatbox.lastChild.innerHTML="❌ Server Error";
-console.error(err);
+chatbox.lastChild.innerHTML = "❌ API Error";
 }
 
 chatbox.scrollTop = chatbox.scrollHeight;
 }
 
-/* CLEAR CHAT */
-function clearChat(){
-localStorage.removeItem("chat");
-document.getElementById("chatbox").innerHTML="";
+/* CLEAR */
+window.clearChat = function(){
+chatbox.innerHTML="";
 }
 
-/* VOICE INPUT */
-function startVoice(){
-try{
-let rec = new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-
+/* VOICE */
+window.startVoice = function(){
+let rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
 rec.onresult = (e)=>{
-document.getElementById("msg").value = e.results[0][0].transcript;
+msg.value = e.results[0][0].transcript;
 send();
 };
-
 rec.start();
-
-}catch{
-alert("Mic not supported");
-}
 }
 
+});
 </script>
+
+</body>
+</html>
