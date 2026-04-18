@@ -2,27 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Tools Hub</title>
+<title>AI Tools Hub - Free AI Tools & Spam Checker</title>
+
+<meta name="description" content="Free AI tools hub. Chat, translate, blog generator, SEO tools and spam detection worldwide.">
+<meta name="keywords" content="ai tools, spam checker, blog generator, seo tools, translate ai, free ai tools">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
 
 <style>
 body{font-family:sans-serif;margin:0;background:#111;color:#fff}
-header{display:flex;overflow:auto;background:#000}
+header{display:flex;flex-wrap:wrap;background:#000}
 header button{flex:1;padding:10px;border:none;background:#000;color:#fff}
 header button.active{background:#444}
 .tool{display:none;padding:15px}
 .tool.active{display:block}
 input,textarea,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:none}
 button{padding:10px;border:none;border-radius:8px;margin:5px 0;background:#00c3ff;color:#000}
-#chatbox{height:300px;overflow:auto;background:#222;padding:10px;border-radius:10px}
-.msg{margin:5px 0;padding:8px;border-radius:8px}
-.user{background:#0084ff}
-.bot{background:#444}
-.share{display:flex;gap:5px;padding:10px}
-canvas{width:100%;background:#000;margin-top:10px}
+footer{background:#000;padding:20px;text-align:center;margin-top:20px}
+a{color:#00c3ff}
 </style>
-
 </head>
 
 <body>
@@ -31,149 +29,114 @@ canvas{width:100%;background:#000;margin-top:10px}
 <button onclick="showTool('chat',this)" class="active">Chat 🤖</button>
 <button onclick="showTool('translate',this)">Translate 🌍</button>
 <button onclick="showTool('blog',this)">Blog ✍️</button>
-<button onclick="showTool('image',this)">Image 🔥</button>
 <button onclick="showTool('seo',this)">SEO 🔎</button>
+<button onclick="showTool('about',this)">About</button>
+<button onclick="showTool('privacy',this)">Privacy</button>
+<button onclick="showTool('contact',this)">Contact</button>
 </header>
-
-<!-- 🔗 SHARE -->
-<div class="share">
-<button onclick="shareWhatsApp()">WhatsApp</button>
-<button onclick="shareFacebook()">Facebook</button>
-<button onclick="shareTwitter()">Twitter</button>
-<button onclick="copyLink()">Copy Link</button>
-</div>
 
 <!-- 🤖 CHAT -->
 <div id="chat" class="tool active">
-<h2>AI Chat + Voice 🤖🔊</h2>
-
-<select id="chatLang">
-<option value="auto">Auto</option>
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="fr">French</option>
-<option value="es">Spanish</option>
-<option value="bn">Bengali</option>
-<option value="ta">Tamil</option>
-<option value="te">Telugu</option>
-<option value="mr">Marathi</option>
-<option value="ur">Urdu</option>
-</select>
-
-<div id="chatbox"></div>
-
+<h2>AI Chat Tool</h2>
 <input id="msg" placeholder="Type message...">
 <button onclick="send()">Send</button>
-<button onclick="stopSpeak()">🛑 Stop Voice</button>
+<div id="chatbox"></div>
 </div>
 
 <!-- 🌍 TRANSLATE -->
 <div id="translate" class="tool">
-<h2>Translate + Voice 🌍🔊</h2>
-
-<select id="fromLang">
-<option value="auto">Auto Detect</option>
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="fr">French</option>
-<option value="es">Spanish</option>
-<option value="de">German</option>
-<option value="ru">Russian</option>
-<option value="zh">Chinese</option>
-<option value="ja">Japanese</option>
-<option value="ar">Arabic</option>
-<option value="bn">Bengali</option>
-<option value="ta">Tamil</option>
-<option value="te">Telugu</option>
-<option value="mr">Marathi</option>
-<option value="ur">Urdu</option>
-</select>
-
-<select id="toLang">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="fr">French</option>
-<option value="es">Spanish</option>
-<option value="de">German</option>
-<option value="ru">Russian</option>
-<option value="zh">Chinese</option>
-<option value="ja">Japanese</option>
-<option value="ar">Arabic</option>
-<option value="bn">Bengali</option>
-<option value="ta">Tamil</option>
-<option value="te">Telugu</option>
-<option value="mr">Marathi</option>
-<option value="ur">Urdu</option>
-</select>
-
+<h2>Translate Tool</h2>
 <textarea id="transText" placeholder="Enter text..."></textarea>
 <button onclick="translate()">Translate</button>
-<button onclick="stopSpeak()">🛑 Stop Voice</button>
-
 <p id="transResult"></p>
 </div>
 
 <!-- ✍️ BLOG -->
 <div id="blog" class="tool">
-<h2>Blog Generator + Voice ✍️🔊</h2>
-
+<h2>Blog Generator</h2>
 <input id="blogTopic" placeholder="Enter topic">
-
-<select id="blogLang">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="fr">French</option>
-<option value="es">Spanish</option>
-<option value="de">German</option>
-<option value="bn">Bengali</option>
-<option value="ta">Tamil</option>
-<option value="te">Telugu</option>
-<option value="mr">Marathi</option>
-</select>
-
 <button onclick="blog()">Generate</button>
-<button onclick="stopSpeak()">🛑 Stop Voice</button>
-
 <p id="blogResult"></p>
 </div>
 
-<!-- 🖼️ IMAGE TOOL -->
-<div id="image" class="tool">
-<h2>Image Editor 🔥</h2>
-
-<input type="file" onchange="loadImage(event)">
-
-<button onclick="rotateImage()">Rotate 🔄</button>
-<button onclick="cropImage()">Crop ✂️</button>
-<button onclick="applyEffect('grayscale')">Grayscale</button>
-<button onclick="applyEffect('blur')">Blur</button>
-<button onclick="applyEffect('brightness')">Bright</button>
-
-<canvas id="canvas"></canvas>
-</div>
-
-<!-- 🔎 SEO TOOL -->
+<!-- 🔎 SEO -->
 <div id="seo" class="tool">
-<h2>SEO Generator 🔎</h2>
-
+<h2>SEO Generator</h2>
 <input id="title" placeholder="Enter Title">
 <textarea id="desc" placeholder="Enter Description"></textarea>
-
 <button onclick="seo()">Generate</button>
-
 <p id="seoResult"></p>
 </div>
 
-<script src="script.js"></script>
+<!-- 📄 ABOUT -->
+<div id="about" class="tool">
+<h2>About Us</h2>
+<p>
+AI Tools Hub ek free platform hai jaha aap Chat, Translate, Blog aur SEO tools use kar sakte ho. 
+Hamari website ka goal hai users ko safe aur smart online experience dena.
+</p>
+</div>
+
+<!-- 🔒 PRIVACY -->
+<div id="privacy" class="tool">
+<h2>Privacy Policy</h2>
+<p>
+Hum aapki personal information collect nahi karte. 
+Website par third-party ads (Google AdSense) use hote hain jo cookies ka use kar sakte hain.
+By using this website, you agree to our privacy policy.
+</p>
+</div>
+
+<!-- 📞 CONTACT -->
+<div id="contact" class="tool">
+<h2>Contact Us</h2>
+<p>Email: your@email.com</p>
+<p>For any issue or support, contact us anytime.</p>
+</div>
+
+<!-- 🔥 AUTO BLOG (SEO BOOST) -->
+<div class="tool active">
+<h2>Latest Articles</h2>
+
+<h3>What is Spam Message?</h3>
+<p>Spam messages fake offers hote hain jo users ko cheat karne ke liye bheje jate hain.</p>
+
+<h3>How to Stay Safe Online?</h3>
+<p>Kabhi bhi unknown link par click na karein aur personal info share na karein.</p>
+
+<h3>AI Tools Benefits</h3>
+<p>AI tools se aap fast kaam kar sakte hain jaise content writing aur translation.</p>
+
+</div>
+
+<!-- 💰 ADSENSE -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
-     crossorigin="anonymous"></script>
+crossorigin="anonymous"></script>
+
 <ins class="adsbygoogle"
-     style="display:block"
-     data-ad-format="autorelaxed"
-     data-ad-client="ca-pub-8334252996051264"
-     data-ad-slot="4642297677"></ins>
+style="display:block"
+data-ad-format="auto"
+data-ad-client="ca-pub-8334252996051264"
+data-ad-slot="4642297677"></ins>
+
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+(adsbygoogle = window.adsbygoogle || []).push({});
+
+function showTool(id,btn){
+document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+
+document.querySelectorAll('header button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
 </script>
+
+<footer>
+<p>© 2026 AI Tools Hub</p>
+<a href="#" onclick="showTool('privacy',this)">Privacy Policy</a> |
+<a href="#" onclick="showTool('about',this)">About</a> |
+<a href="#" onclick="showTool('contact',this)">Contact</a>
+</footer>
+
 </body>
 </html>
