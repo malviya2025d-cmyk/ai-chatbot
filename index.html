@@ -1,130 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>AI Tools Hub Ultimate</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- ✅ ADSENSE -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
-crossorigin="anonymous"></script>
-
-<style>
-body{
-margin:0;
-font-family:sans-serif;
-background:#0f2027;
-color:#fff;
-}
-
-/* HEADER */
-header{display:flex;background:#000}
-header button{
-flex:1;padding:10px;border:none;background:#111;color:#fff;cursor:pointer
-}
-header button.active{background:#00c3ff;color:#000}
-
-/* TOOL */
-.tool{display:none;padding:10px}
-.tool.active{display:block}
-
-/* CHAT */
-#chatbox{height:300px;overflow:auto;background:#111;padding:10px}
-.msg{margin:5px;padding:8px;border-radius:10px}
-.user{background:#0084ff;text-align:right}
-.bot{background:#333}
-
-/* INPUT */
-input,textarea,select{
-width:100%;padding:10px;margin-top:5px;border:none;border-radius:8px
-}
-
-button{
-margin-top:5px;padding:10px;border:none;border-radius:8px;
-background:#00c3ff;color:#000;cursor:pointer
-}
-
-/* IMAGE */
-canvas{width:100%;margin-top:10px;border-radius:10px}
-
-/* PROGRESS */
-#progress{display:none;background:#222;border-radius:10px}
-#bar{width:0;height:10px;background:#00c3ff}
-</style>
-</head>
-
-<body>
-
-<header>
-<button onclick="showTool('chat',this)" class="active">Chat</button>
-<button onclick="showTool('translate',this)">Translate</button>
-<button onclick="showTool('image',this)">Image</button>
-</header>
-
-<!-- 🔥 TOP AD -->
-<ins class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-8334252996051264"
-data-ad-slot="1234567890"
-data-ad-format="auto"
-data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-
-<!-- CHAT -->
-<div id="chat" class="tool active">
-<h2>AI Chat</h2>
-<div id="chatbox"></div>
-
-<input id="msg">
-<button onclick="send()">Send</button>
-<button onclick="startVoice()">🎤 Speak</button>
-<button onclick="speechSynthesis.cancel()">🛑 Stop</button>
-<button onclick="clearChat()">🧹 Clear</button>
-</div>
-
-<!-- TRANSLATE -->
-<div id="translate" class="tool">
-<h2>Translator</h2>
-<select id="toLang">
-<option>Hindi</option><option>English</option><option>Bengali</option>
-<option>Tamil</option><option>Telugu</option><option>Marathi</option>
-</select>
-
-<textarea id="transText"></textarea>
-<button onclick="translateText()">Translate</button>
-<p id="transResult"></p>
-</div>
-
-<!-- IMAGE -->
-<div id="image" class="tool">
-<h2>Image Editor 🔥</h2>
-
-<input type="file" onchange="loadImage(event)">
-
-<button onclick="effect('grayscale')">Grayscale</button>
-<button onclick="effect('invert')">Invert</button>
-<button onclick="effect('sepia')">Sepia</button>
-<button onclick="effect('blur')">Blur</button>
-<button onclick="effect('bright')">Bright</button>
-<button onclick="effect('contrast')">Contrast</button>
-<button onclick="effect('saturate')">Saturate</button>
-<button onclick="effect('hue')">Hue</button>
-<button onclick="effect('shadow')">Shadow</button>
-<button onclick="effect('reset')">Reset</button>
-
-<canvas id="canvas"></canvas>
-
-<button onclick="downloadImage()">Download</button>
-
-<div id="progress"><div id="bar"></div></div>
-</div>
-
 <script>
 
-/* 🔑 API */
-const API_KEY="PASTE_YOUR_GROQ_API_KEY";
-
-/* TOOL */
+/* TOOL SWITCH */
 function showTool(id,btn){
 document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
@@ -132,144 +8,101 @@ document.querySelectorAll('header button').forEach(b=>b.classList.remove('active
 btn.classList.add('active');
 }
 
-/* ENTER */
-document.getElementById("msg").addEventListener("keydown",e=>{
-if(e.key==="Enter"){e.preventDefault();send();}
+/* DOM LOAD FIX */
+window.addEventListener("DOMContentLoaded",()=>{
+
+const msgInput = document.getElementById("msg");
+const chatbox = document.getElementById("chatbox");
+
+/* ENTER KEY */
+msgInput.addEventListener("keydown",function(e){
+if(e.key==="Enter"){
+e.preventDefault();
+send();
+}
 });
 
-/* CHAT */
+/* LOAD OLD CHAT */
+let old = localStorage.getItem("chat");
+if(old) chatbox.innerHTML = old;
+
+});
+
+/* CHAT SEND */
 async function send(){
-let msg=msgInput.value;
+
+const msgInput = document.getElementById("msg");
+const chatbox = document.getElementById("chatbox");
+
+let msg = msgInput.value.trim();
 if(!msg) return;
 
-chatbox.innerHTML+=`<div class="msg user">🧑 ${msg}</div>`;
-msgInput.value="";
-chatbox.innerHTML+=`<div class="msg bot">🤖...</div>`;
+chatbox.innerHTML += `<div class="msg user">🧑 ${msg}</div>`;
+msgInput.value = "";
 
-let res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+chatbox.innerHTML += `<div class="msg bot">🤖 Typing...</div>`;
+
+try{
+
+let res = await fetch("/api/ai",{
 method:"POST",
 headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+API_KEY
+"Content-Type":"application/json"
 },
-body:JSON.stringify({
-model:"mixtral-8x7b-32768",
-messages:[{role:"user",content:msg}]
-})
+body:JSON.stringify({message:msg})
 });
 
-let data=await res.json();
-let reply=data?.choices?.[0]?.message?.content||"Error";
+let data = await res.json();
 
-chatbox.lastChild.innerHTML="🤖 "+reply;
-speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
+/* DEBUG */
+console.log(data);
 
+/* SAFE RESPONSE */
+let reply = data?.choices?.[0]?.message?.content;
+
+if(!reply){
+chatbox.lastChild.innerHTML="❌ No reply (check API)";
+return;
+}
+
+chatbox.lastChild.innerHTML = "🤖 " + reply;
+
+/* SAVE CHAT */
 localStorage.setItem("chat",chatbox.innerHTML);
-}
-
-/* LOAD */
-window.onload=()=>{
-let d=localStorage.getItem("chat");
-if(d) chatbox.innerHTML=d;
-}
-
-/* CLEAR */
-function clearChat(){
-localStorage.removeItem("chat");
-chatbox.innerHTML="";
-}
-
-/* TRANSLATE */
-async function translateText(){
-let text=transText.value;
-let lang=toLang.value;
-
-let res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+API_KEY
-},
-body:JSON.stringify({
-model:"mixtral-8x7b-32768",
-messages:[
-{role:"system",content:"Translate into "+lang},
-{role:"user",content:text}
-]
-})
-});
-
-let data=await res.json();
-let out=data?.choices?.[0]?.message?.content||"Error";
-
-transResult.innerText=out;
-speechSynthesis.speak(new SpeechSynthesisUtterance(out));
-}
 
 /* VOICE */
+speechSynthesis.cancel();
+speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
+
+}catch(err){
+chatbox.lastChild.innerHTML="❌ Server Error";
+console.error(err);
+}
+
+chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+/* CLEAR CHAT */
+function clearChat(){
+localStorage.removeItem("chat");
+document.getElementById("chatbox").innerHTML="";
+}
+
+/* VOICE INPUT */
 function startVoice(){
-let rec=new(window.SpeechRecognition||webkitSpeechRecognition)();
-rec.onresult=e=>{
-msgInput.value=e.results[0][0].transcript;
+try{
+let rec = new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+
+rec.onresult = (e)=>{
+document.getElementById("msg").value = e.results[0][0].transcript;
 send();
 };
+
 rec.start();
-}
 
-/* IMAGE */
-let canvas=document.getElementById("canvas");
-let ctx=canvas.getContext("2d");
-let img=new Image();
-let filter="none";
-
-function loadImage(e){
-img.src=URL.createObjectURL(e.target.files[0]);
-img.onload=()=>{
-canvas.width=img.width;
-canvas.height=img.height;
-draw();
+}catch{
+alert("Mic not supported");
 }
-}
-
-function draw(){
-ctx.filter=filter;
-ctx.drawImage(img,0,0);
-}
-
-function effect(t){
-if(t=="grayscale")filter="grayscale(100%)";
-if(t=="invert")filter="invert(100%)";
-if(t=="sepia")filter="sepia(100%)";
-if(t=="blur")filter="blur(5px)";
-if(t=="bright")filter="brightness(150%)";
-if(t=="contrast")filter="contrast(200%)";
-if(t=="saturate")filter="saturate(200%)";
-if(t=="hue")filter="hue-rotate(90deg)";
-if(t=="shadow")filter="drop-shadow(10px 10px 10px black)";
-if(t=="reset")filter="none";
-draw();
-}
-
-/* DOWNLOAD */
-function downloadImage(){
-progress.style.display="block";
-let w=0;
-let i=setInterval(()=>{
-w+=10;
-bar.style.width=w+"%";
-if(w>=100){
-clearInterval(i);
-let a=document.createElement("a");
-a.href=canvas.toDataURL();
-a.download="image.png";
-a.click();
-progress.style.display="none";
-bar.style.width="0%";
-}
-},100);
 }
 
 </script>
-
-</body>
-</html>
