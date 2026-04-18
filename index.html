@@ -2,65 +2,35 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Tools Hub Pro</title>
+<title>AI Tools Hub Ultimate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ✅ ADSENSE -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
+crossorigin="anonymous"></script>
 
 <style>
 body{
 margin:0;
 font-family:sans-serif;
+background:#0f2027;
 color:#fff;
-background:linear-gradient(270deg,#0f2027,#203a43,#2c5364);
-background-size:600% 600%;
-animation:bgMove 10s infinite;
-}
-@keyframes bgMove{
-0%{background-position:0% 50%}
-50%{background-position:100% 50%}
-100%{background-position:0% 50%}
-}
-
-/* LOADER */
-#loader{
-position:fixed;
-width:100%;height:100%;
-background:#000;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-z-index:9999;
-}
-.loader-face{
-font-size:50px;
-animation:jump 1s infinite;
-}
-@keyframes jump{
-0%,100%{transform:translateY(0)}
-50%{transform:translateY(-20px)}
 }
 
 /* HEADER */
-header{display:flex;flex-wrap:wrap;background:rgba(0,0,0,0.7)}
+header{display:flex;background:#000}
 header button{
-flex:1;padding:10px;border:none;background:transparent;color:#fff;
-cursor:pointer;transition:.3s
-}
-header button:hover{
-background:#00c3ff;color:#000;transform:scale(1.1)
+flex:1;padding:10px;border:none;background:#111;color:#fff;cursor:pointer
 }
 header button.active{background:#00c3ff;color:#000}
 
-.tool{display:none;padding:15px}
+/* TOOL */
+.tool{display:none;padding:10px}
 .tool.active{display:block}
 
 /* CHAT */
-#chatbox{
-height:300px;overflow:auto;
-background:rgba(0,0,0,0.5);
-padding:10px;border-radius:10px
-}
-.msg{padding:8px;margin:5px;border-radius:10px}
+#chatbox{height:300px;overflow:auto;background:#111;padding:10px}
+.msg{margin:5px;padding:8px;border-radius:10px}
 .user{background:#0084ff;text-align:right}
 .bot{background:#333}
 
@@ -69,82 +39,78 @@ input,textarea,select{
 width:100%;padding:10px;margin-top:5px;border:none;border-radius:8px
 }
 
-/* BUTTON */
 button{
-padding:10px;margin-top:5px;border:none;border-radius:8px;
+margin-top:5px;padding:10px;border:none;border-radius:8px;
 background:#00c3ff;color:#000;cursor:pointer
 }
-button:hover{background:#00ffe0}
 
 /* IMAGE */
 canvas{width:100%;margin-top:10px;border-radius:10px}
 
 /* PROGRESS */
-#progress{width:100%;background:#222;border-radius:10px;overflow:hidden;display:none}
+#progress{display:none;background:#222;border-radius:10px}
 #bar{width:0;height:10px;background:#00c3ff}
 </style>
 </head>
 
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-<div class="loader-face">🤖</div>
-<p>Loading AI...</p>
-</div>
-
 <header>
-<button onclick="showTool('chat',this)" class="active">Chat 🤖</button>
-<button onclick="showTool('translate',this)">Translate 🌍</button>
-<button onclick="showTool('image',this)">Image 🔥</button>
+<button onclick="showTool('chat',this)" class="active">Chat</button>
+<button onclick="showTool('translate',this)">Translate</button>
+<button onclick="showTool('image',this)">Image</button>
 </header>
+
+<!-- 🔥 TOP AD -->
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-8334252996051264"
+data-ad-slot="1234567890"
+data-ad-format="auto"
+data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
 <!-- CHAT -->
 <div id="chat" class="tool active">
 <h2>AI Chat</h2>
 <div id="chatbox"></div>
-<input id="msg" placeholder="Type message..." onkeypress="enterSend(event)">
+
+<input id="msg">
 <button onclick="send()">Send</button>
+<button onclick="startVoice()">🎤 Speak</button>
+<button onclick="speechSynthesis.cancel()">🛑 Stop</button>
+<button onclick="clearChat()">🧹 Clear</button>
 </div>
 
 <!-- TRANSLATE -->
 <div id="translate" class="tool">
 <h2>Translator</h2>
-
 <select id="toLang">
-<option value="hi">Hindi</option>
-<option value="en">English</option>
-<option value="bn">Bengali</option>
-<option value="ta">Tamil</option>
-<option value="te">Telugu</option>
-<option value="mr">Marathi</option>
-<option value="gu">Gujarati</option>
-<option value="pa">Punjabi</option>
-<option value="ur">Urdu</option>
+<option>Hindi</option><option>English</option><option>Bengali</option>
+<option>Tamil</option><option>Telugu</option><option>Marathi</option>
 </select>
 
-<textarea id="transText" placeholder="Enter text"></textarea>
+<textarea id="transText"></textarea>
 <button onclick="translateText()">Translate</button>
-
 <p id="transResult"></p>
 </div>
 
-<!-- IMAGE TOOL -->
+<!-- IMAGE -->
 <div id="image" class="tool">
 <h2>Image Editor 🔥</h2>
 
 <input type="file" onchange="loadImage(event)">
 
-<button onclick="applyEffect('grayscale')">Grayscale</button>
-<button onclick="applyEffect('invert')">Invert</button>
-<button onclick="applyEffect('sepia')">Sepia</button>
-<button onclick="applyEffect('blur')">Blur</button>
-<button onclick="applyEffect('brightness')">Bright</button>
-<button onclick="applyEffect('contrast')">Contrast</button>
-<button onclick="applyEffect('saturate')">Saturate</button>
-<button onclick="applyEffect('hue')">Hue</button>
-<button onclick="applyEffect('shadow')">Shadow</button>
-<button onclick="applyEffect('reset')">Reset</button>
+<button onclick="effect('grayscale')">Grayscale</button>
+<button onclick="effect('invert')">Invert</button>
+<button onclick="effect('sepia')">Sepia</button>
+<button onclick="effect('blur')">Blur</button>
+<button onclick="effect('bright')">Bright</button>
+<button onclick="effect('contrast')">Contrast</button>
+<button onclick="effect('saturate')">Saturate</button>
+<button onclick="effect('hue')">Hue</button>
+<button onclick="effect('shadow')">Shadow</button>
+<button onclick="effect('reset')">Reset</button>
 
 <canvas id="canvas"></canvas>
 
@@ -155,10 +121,10 @@ canvas{width:100%;margin-top:10px;border-radius:10px}
 
 <script>
 
-/* LOADER */
-setTimeout(()=>{loader.style.display="none"},2000);
+/* 🔑 API */
+const API_KEY="PASTE_YOUR_GROQ_API_KEY";
 
-/* TOOL SWITCH */
+/* TOOL */
 function showTool(id,btn){
 document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
@@ -166,29 +132,88 @@ document.querySelectorAll('header button').forEach(b=>b.classList.remove('active
 btn.classList.add('active');
 }
 
-/* ENTER KEY */
-function enterSend(e){ if(e.key==="Enter") send(); }
+/* ENTER */
+document.getElementById("msg").addEventListener("keydown",e=>{
+if(e.key==="Enter"){e.preventDefault();send();}
+});
 
 /* CHAT */
-function send(){
+async function send(){
 let msg=msgInput.value;
 if(!msg) return;
 
 chatbox.innerHTML+=`<div class="msg user">🧑 ${msg}</div>`;
-
-setTimeout(()=>{
-chatbox.innerHTML+=`<div class="msg bot">🤖 ${msg} 😊</div>`;
-chatbox.scrollTop=chatbox.scrollHeight;
-},500);
-
 msgInput.value="";
+chatbox.innerHTML+=`<div class="msg bot">🤖...</div>`;
+
+let res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+API_KEY
+},
+body:JSON.stringify({
+model:"mixtral-8x7b-32768",
+messages:[{role:"user",content:msg}]
+})
+});
+
+let data=await res.json();
+let reply=data?.choices?.[0]?.message?.content||"Error";
+
+chatbox.lastChild.innerHTML="🤖 "+reply;
+speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
+
+localStorage.setItem("chat",chatbox.innerHTML);
+}
+
+/* LOAD */
+window.onload=()=>{
+let d=localStorage.getItem("chat");
+if(d) chatbox.innerHTML=d;
+}
+
+/* CLEAR */
+function clearChat(){
+localStorage.removeItem("chat");
+chatbox.innerHTML="";
 }
 
 /* TRANSLATE */
-function translateText(){
-let t=transText.value;
+async function translateText(){
+let text=transText.value;
 let lang=toLang.value;
-transResult.innerText="🌍 ["+lang+"] → "+t;
+
+let res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+API_KEY
+},
+body:JSON.stringify({
+model:"mixtral-8x7b-32768",
+messages:[
+{role:"system",content:"Translate into "+lang},
+{role:"user",content:text}
+]
+})
+});
+
+let data=await res.json();
+let out=data?.choices?.[0]?.message?.content||"Error";
+
+transResult.innerText=out;
+speechSynthesis.speak(new SpeechSynthesisUtterance(out));
+}
+
+/* VOICE */
+function startVoice(){
+let rec=new(window.SpeechRecognition||webkitSpeechRecognition)();
+rec.onresult=e=>{
+msgInput.value=e.results[0][0].transcript;
+send();
+};
+rec.start();
 }
 
 /* IMAGE */
@@ -211,39 +236,34 @@ ctx.filter=filter;
 ctx.drawImage(img,0,0);
 }
 
-function applyEffect(type){
-switch(type){
-case "grayscale": filter="grayscale(100%)"; break;
-case "invert": filter="invert(100%)"; break;
-case "sepia": filter="sepia(100%)"; break;
-case "blur": filter="blur(5px)"; break;
-case "brightness": filter="brightness(150%)"; break;
-case "contrast": filter="contrast(200%)"; break;
-case "saturate": filter="saturate(200%)"; break;
-case "hue": filter="hue-rotate(90deg)"; break;
-case "shadow": filter="drop-shadow(10px 10px 10px black)"; break;
-case "reset": filter="none"; break;
-}
+function effect(t){
+if(t=="grayscale")filter="grayscale(100%)";
+if(t=="invert")filter="invert(100%)";
+if(t=="sepia")filter="sepia(100%)";
+if(t=="blur")filter="blur(5px)";
+if(t=="bright")filter="brightness(150%)";
+if(t=="contrast")filter="contrast(200%)";
+if(t=="saturate")filter="saturate(200%)";
+if(t=="hue")filter="hue-rotate(90deg)";
+if(t=="shadow")filter="drop-shadow(10px 10px 10px black)";
+if(t=="reset")filter="none";
 draw();
 }
 
 /* DOWNLOAD */
 function downloadImage(){
-let bar=document.getElementById("bar");
-let prog=document.getElementById("progress");
-prog.style.display="block";
-
+progress.style.display="block";
 let w=0;
 let i=setInterval(()=>{
 w+=10;
 bar.style.width=w+"%";
 if(w>=100){
 clearInterval(i);
-let link=document.createElement('a');
-link.download="image.png";
-link.href=canvas.toDataURL();
-link.click();
-prog.style.display="none";
+let a=document.createElement("a");
+a.href=canvas.toDataURL();
+a.download="image.png";
+a.click();
+progress.style.display="none";
 bar.style.width="0%";
 }
 },100);
