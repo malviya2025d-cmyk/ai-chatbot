@@ -2,141 +2,254 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Tools Hub - Free AI Tools & Spam Checker</title>
-
-<meta name="description" content="Free AI tools hub. Chat, translate, blog generator, SEO tools and spam detection worldwide.">
-<meta name="keywords" content="ai tools, spam checker, blog generator, seo tools, translate ai, free ai tools">
-
+<title>AI Tools Hub Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{font-family:sans-serif;margin:0;background:#111;color:#fff}
-header{display:flex;flex-wrap:wrap;background:#000}
-header button{flex:1;padding:10px;border:none;background:#000;color:#fff}
-header button.active{background:#444}
+body{
+margin:0;
+font-family:sans-serif;
+color:#fff;
+background:linear-gradient(270deg,#0f2027,#203a43,#2c5364);
+background-size:600% 600%;
+animation:bgMove 10s infinite;
+}
+@keyframes bgMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+/* LOADER */
+#loader{
+position:fixed;
+width:100%;height:100%;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:9999;
+}
+.loader-face{
+font-size:50px;
+animation:jump 1s infinite;
+}
+@keyframes jump{
+0%,100%{transform:translateY(0)}
+50%{transform:translateY(-20px)}
+}
+
+/* HEADER */
+header{display:flex;flex-wrap:wrap;background:rgba(0,0,0,0.7)}
+header button{
+flex:1;padding:10px;border:none;background:transparent;color:#fff;
+cursor:pointer;transition:.3s
+}
+header button:hover{
+background:#00c3ff;color:#000;transform:scale(1.1)
+}
+header button.active{background:#00c3ff;color:#000}
+
 .tool{display:none;padding:15px}
 .tool.active{display:block}
-input,textarea,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:none}
-button{padding:10px;border:none;border-radius:8px;margin:5px 0;background:#00c3ff;color:#000}
-footer{background:#000;padding:20px;text-align:center;margin-top:20px}
-a{color:#00c3ff}
+
+/* CHAT */
+#chatbox{
+height:300px;overflow:auto;
+background:rgba(0,0,0,0.5);
+padding:10px;border-radius:10px
+}
+.msg{padding:8px;margin:5px;border-radius:10px}
+.user{background:#0084ff;text-align:right}
+.bot{background:#333}
+
+/* INPUT */
+input,textarea,select{
+width:100%;padding:10px;margin-top:5px;border:none;border-radius:8px
+}
+
+/* BUTTON */
+button{
+padding:10px;margin-top:5px;border:none;border-radius:8px;
+background:#00c3ff;color:#000;cursor:pointer
+}
+button:hover{background:#00ffe0}
+
+/* IMAGE */
+canvas{width:100%;margin-top:10px;border-radius:10px}
+
+/* PROGRESS */
+#progress{width:100%;background:#222;border-radius:10px;overflow:hidden;display:none}
+#bar{width:0;height:10px;background:#00c3ff}
 </style>
 </head>
 
 <body>
 
+<!-- LOADER -->
+<div id="loader">
+<div class="loader-face">🤖</div>
+<p>Loading AI...</p>
+</div>
+
 <header>
 <button onclick="showTool('chat',this)" class="active">Chat 🤖</button>
 <button onclick="showTool('translate',this)">Translate 🌍</button>
-<button onclick="showTool('blog',this)">Blog ✍️</button>
-<button onclick="showTool('seo',this)">SEO 🔎</button>
-<button onclick="showTool('about',this)">About</button>
-<button onclick="showTool('privacy',this)">Privacy</button>
-<button onclick="showTool('contact',this)">Contact</button>
+<button onclick="showTool('image',this)">Image 🔥</button>
 </header>
 
-<!-- 🤖 CHAT -->
+<!-- CHAT -->
 <div id="chat" class="tool active">
-<h2>AI Chat Tool</h2>
-<input id="msg" placeholder="Type message...">
-<button onclick="send()">Send</button>
+<h2>AI Chat</h2>
 <div id="chatbox"></div>
+<input id="msg" placeholder="Type message..." onkeypress="enterSend(event)">
+<button onclick="send()">Send</button>
 </div>
 
-<!-- 🌍 TRANSLATE -->
+<!-- TRANSLATE -->
 <div id="translate" class="tool">
-<h2>Translate Tool</h2>
-<textarea id="transText" placeholder="Enter text..."></textarea>
-<button onclick="translate()">Translate</button>
+<h2>Translator</h2>
+
+<select id="toLang">
+<option value="hi">Hindi</option>
+<option value="en">English</option>
+<option value="bn">Bengali</option>
+<option value="ta">Tamil</option>
+<option value="te">Telugu</option>
+<option value="mr">Marathi</option>
+<option value="gu">Gujarati</option>
+<option value="pa">Punjabi</option>
+<option value="ur">Urdu</option>
+</select>
+
+<textarea id="transText" placeholder="Enter text"></textarea>
+<button onclick="translateText()">Translate</button>
+
 <p id="transResult"></p>
 </div>
 
-<!-- ✍️ BLOG -->
-<div id="blog" class="tool">
-<h2>Blog Generator</h2>
-<input id="blogTopic" placeholder="Enter topic">
-<button onclick="blog()">Generate</button>
-<p id="blogResult"></p>
+<!-- IMAGE TOOL -->
+<div id="image" class="tool">
+<h2>Image Editor 🔥</h2>
+
+<input type="file" onchange="loadImage(event)">
+
+<button onclick="applyEffect('grayscale')">Grayscale</button>
+<button onclick="applyEffect('invert')">Invert</button>
+<button onclick="applyEffect('sepia')">Sepia</button>
+<button onclick="applyEffect('blur')">Blur</button>
+<button onclick="applyEffect('brightness')">Bright</button>
+<button onclick="applyEffect('contrast')">Contrast</button>
+<button onclick="applyEffect('saturate')">Saturate</button>
+<button onclick="applyEffect('hue')">Hue</button>
+<button onclick="applyEffect('shadow')">Shadow</button>
+<button onclick="applyEffect('reset')">Reset</button>
+
+<canvas id="canvas"></canvas>
+
+<button onclick="downloadImage()">Download</button>
+
+<div id="progress"><div id="bar"></div></div>
 </div>
-
-<!-- 🔎 SEO -->
-<div id="seo" class="tool">
-<h2>SEO Generator</h2>
-<input id="title" placeholder="Enter Title">
-<textarea id="desc" placeholder="Enter Description"></textarea>
-<button onclick="seo()">Generate</button>
-<p id="seoResult"></p>
-</div>
-
-<!-- 📄 ABOUT -->
-<div id="about" class="tool">
-<h2>About Us</h2>
-<p>
-AI Tools Hub ek free platform hai jaha aap Chat, Translate, Blog aur SEO tools use kar sakte ho. 
-Hamari website ka goal hai users ko safe aur smart online experience dena.
-</p>
-</div>
-
-<!-- 🔒 PRIVACY -->
-<div id="privacy" class="tool">
-<h2>Privacy Policy</h2>
-<p>
-Hum aapki personal information collect nahi karte. 
-Website par third-party ads (Google AdSense) use hote hain jo cookies ka use kar sakte hain.
-By using this website, you agree to our privacy policy.
-</p>
-</div>
-
-<!-- 📞 CONTACT -->
-<div id="contact" class="tool">
-<h2>Contact Us</h2>
-<p>Email: your@email.com</p>
-<p>For any issue or support, contact us anytime.</p>
-</div>
-
-<!-- 🔥 AUTO BLOG (SEO BOOST) -->
-<div class="tool active">
-<h2>Latest Articles</h2>
-
-<h3>What is Spam Message?</h3>
-<p>Spam messages fake offers hote hain jo users ko cheat karne ke liye bheje jate hain.</p>
-
-<h3>How to Stay Safe Online?</h3>
-<p>Kabhi bhi unknown link par click na karein aur personal info share na karein.</p>
-
-<h3>AI Tools Benefits</h3>
-<p>AI tools se aap fast kaam kar sakte hain jaise content writing aur translation.</p>
-
-</div>
-
-<!-- 💰 ADSENSE -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8334252996051264"
-crossorigin="anonymous"></script>
-
-<ins class="adsbygoogle"
-style="display:block"
-data-ad-format="auto"
-data-ad-client="ca-pub-8334252996051264"
-data-ad-slot="4642297677"></ins>
 
 <script>
-(adsbygoogle = window.adsbygoogle || []).push({});
 
+/* LOADER */
+setTimeout(()=>{loader.style.display="none"},2000);
+
+/* TOOL SWITCH */
 function showTool(id,btn){
 document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
-
 document.querySelectorAll('header button').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 }
-</script>
 
-<footer>
-<p>© 2026 AI Tools Hub</p>
-<a href="#" onclick="showTool('privacy',this)">Privacy Policy</a> |
-<a href="#" onclick="showTool('about',this)">About</a> |
-<a href="#" onclick="showTool('contact',this)">Contact</a>
-</footer>
+/* ENTER KEY */
+function enterSend(e){ if(e.key==="Enter") send(); }
+
+/* CHAT */
+function send(){
+let msg=msgInput.value;
+if(!msg) return;
+
+chatbox.innerHTML+=`<div class="msg user">🧑 ${msg}</div>`;
+
+setTimeout(()=>{
+chatbox.innerHTML+=`<div class="msg bot">🤖 ${msg} 😊</div>`;
+chatbox.scrollTop=chatbox.scrollHeight;
+},500);
+
+msgInput.value="";
+}
+
+/* TRANSLATE */
+function translateText(){
+let t=transText.value;
+let lang=toLang.value;
+transResult.innerText="🌍 ["+lang+"] → "+t;
+}
+
+/* IMAGE */
+let canvas=document.getElementById("canvas");
+let ctx=canvas.getContext("2d");
+let img=new Image();
+let filter="none";
+
+function loadImage(e){
+img.src=URL.createObjectURL(e.target.files[0]);
+img.onload=()=>{
+canvas.width=img.width;
+canvas.height=img.height;
+draw();
+}
+}
+
+function draw(){
+ctx.filter=filter;
+ctx.drawImage(img,0,0);
+}
+
+function applyEffect(type){
+switch(type){
+case "grayscale": filter="grayscale(100%)"; break;
+case "invert": filter="invert(100%)"; break;
+case "sepia": filter="sepia(100%)"; break;
+case "blur": filter="blur(5px)"; break;
+case "brightness": filter="brightness(150%)"; break;
+case "contrast": filter="contrast(200%)"; break;
+case "saturate": filter="saturate(200%)"; break;
+case "hue": filter="hue-rotate(90deg)"; break;
+case "shadow": filter="drop-shadow(10px 10px 10px black)"; break;
+case "reset": filter="none"; break;
+}
+draw();
+}
+
+/* DOWNLOAD */
+function downloadImage(){
+let bar=document.getElementById("bar");
+let prog=document.getElementById("progress");
+prog.style.display="block";
+
+let w=0;
+let i=setInterval(()=>{
+w+=10;
+bar.style.width=w+"%";
+if(w>=100){
+clearInterval(i);
+let link=document.createElement('a');
+link.download="image.png";
+link.href=canvas.toDataURL();
+link.click();
+prog.style.display="none";
+bar.style.width="0%";
+}
+},100);
+}
+
+</script>
 
 </body>
 </html>
